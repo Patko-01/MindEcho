@@ -1,1 +1,72 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
+
+.navbar .container-fluid {
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+.collapse.navbar-collapse {
+    justify-content: flex-end;
+}
+
+.navbar-brand {
+    font-size: 25px;
+}
+
+.navbar-nav {
+    font-weight: 400;
+    font-size: 1.1rem;
+    display: flex;
+    gap: 0.9rem; /* spacing between li elements */
+    align-items: center;
+}
+
+/* Make footer stick to the bottom when page content is short. */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    /* allow main to grow and push footer to the bottom */
+    flex: 1 0 auto;
+}
+
+/* Footer column layout: make the left column fill available height and push copyright down */
+footer .col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Push the copyright text to the bottom of its column */
+footer .col .text-body-secondary {
+    margin-top: auto;
+}
+
+p.text-body-secondary {
+    font-size: 0.9rem;
+    opacity: 0.6;
+}
+
+form .midBtn {
+    display: block;
+    margin: 20px auto; /* top/bottom spacing and automatic left/right centering */
+    text-align: center; /* keep the button's label centered */
+}
+
+.authBtn {
+    background-color: rgba(19, 55, 202, 1);
+    color: white;
+    font-weight: 90;
+    padding: 0.5rem 1rem;
+}
+
+.authBtn:hover {
+    background-color: rgba(19, 55, 202, 1);
+    color: white;
+}
