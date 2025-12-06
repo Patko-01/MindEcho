@@ -70,3 +70,116 @@ form .midBtn {
     background-color: rgba(19, 55, 202, 1);
     color: white;
 }
+
+.img-fluid {
+    max-width: 400px;
+    height: auto;
+}
+
+.heading {
+    font-size: 3rem;
+    color: black;
+}
+
+.subheading {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.heading-text {
+    color: black;
+    font-weight: 350;
+}
+
+.intro {
+    width: 56%;
+}
+
+.line {
+    height: 2px;
+    background-color: black;
+    opacity: 1;
+}
+
+.btnStart {
+    background-color: black;
+    color: white;
+    font-weight: 400;
+    padding: 0.7rem 1.2rem;
+}
+
+.btnStart:hover {
+    background-color: black;
+    color: white;
+}
+
+.custom-bullets {
+    list-style: none;
+    padding-left: 0;
+}
+
+.custom-bullets li {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+
+.svg-icon {
+    width: 20px;
+}
+
+.intro-image {
+    position: absolute;
+    transform: translateX(-5rem) rotate(30deg);
+    z-index: -1;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .intro-image {
+        display: none;
+    }
+    .intro {
+        width: 100%;
+    }
+}
+
+/* Clearfix for container elements, after using float on div */
+.container::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.second {
+    margin-top: 4rem;
+}
+
+.form-container {
+    width: 50%;
+    margin: 0 auto;
+}
+
+@media (max-width: 991px) {
+    .form-container {
+        width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    /* Make each about column a vertical flex container to push the icon to the bottom */
+    .about-section .col-md-4 {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.about-icon {
+    width: 80px;
+    height: auto;
+    opacity: 0.9;
+    display: block;
+    align-self: center;
+    margin-top: auto !important; /* push icon to the bottom of the column and override Bootstrap's mt-5 */
+}

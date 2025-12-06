@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="container p-5 w-50">
+    <div class="container form-container p-5 mt-5 mb-5">
         <h2>Login</h2>
         <form action="{{ route('login') }}" method="POST">
             @csrf <!-- CSRF token for security (cross site request forgery) -->
