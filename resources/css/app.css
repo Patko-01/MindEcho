@@ -183,3 +183,69 @@ form .midBtn {
     align-self: center;
     margin-top: auto !important; /* push icon to the bottom of the column and override Bootstrap's mt-5 */
 }
+
+.dashboard-container-part {
+    width: 45%;
+}
+
+.input-group {
+    height: 48px;
+}
+
+.category-header {
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.category-header:hover {
+    background-color: #f7f7f7;
+}
+
+.category-header .badge {
+    background-color: #7a5cff;
+}
+
+/* Arrow rotation */
+.arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+.category-header[aria-expanded="true"] .arrow {
+    transform: rotate(90deg);
+}
+
+.item-box {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.item-box.active {
+    background-color: #efe7ff;
+}
+
+.item-text {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.item-date {
+    font-size: 13px;
+    color: #777;
+    margin-top: -2px;
+}
+
+.fade-smooth {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.fade-smooth.show {
+    opacity: 1;
+}
