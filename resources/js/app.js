@@ -261,3 +261,147 @@ new FormHandler({
         return payload;
     }
 });
+
+// Contact form handler using EmailJS
+(function() {
+    const EMAILJS_SERVICE_ID = 'service_bl4y65j';
+    const EMAILJS_TEMPLATE_ID = 'template_3bdyys8';
+    const EMAILJS_USER_ID = 'f6honLRkEsay40gZ0';
+
+    // Single, promise-based loader + initializer for EmailJS.
+    // Usage: await ensureEmailjs(); // resolves when window.emailjs is available and initialized (if key provided)
+    let _emailjsReady = null;
+
+    function ensureEmailjs() {
+        if (typeof window.emailjs !== 'undefined' && window.emailjs.send) {
+            // already present - ensure init was called if user provided a key
+            try {
+                if (EMAILJS_USER_ID && window.emailjs.init && !window.__emailjs_inited) {
+                    window.emailjs.init(EMAILJS_USER_ID);
+                    window.__emailjs_inited = true;
+                }
+            } catch (e) {
+                console.warn('EmailJS init failed or already initialized', e);
+            }
+            return Promise.resolve(window.emailjs);
+        }
+
+        if (_emailjsReady) {
+            return _emailjsReady;
+        }
+
+        _emailjsReady = new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js';
+            s.async = true;
+            s.onload = () => {
+                try {
+                    if (EMAILJS_USER_ID && window.emailjs && window.emailjs.init) {
+                        window.emailjs.init(EMAILJS_USER_ID);
+                        window.__emailjs_inited = true;
+                    }
+                } catch (e) {
+                    console.warn('EmailJS init failed', e);
+                }
+                if (typeof window.emailjs !== 'undefined' && window.emailjs.send) {
+                    resolve(window.emailjs);
+                } else {
+                    reject(new Error('EmailJS loaded but `emailjs` object missing'));
+                }
+            };
+            s.onerror = () => reject(new Error('Failed to load EmailJS SDK'));
+            document.head.appendChild(s);
+        });
+
+        return _emailjsReady;
+    }
+
+    // Wait for DOM ready to attach handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start loading EmailJS in the background so it's ready by the time the user submits.
+         const form = document.getElementById('contact-form');
+         const submit = document.getElementById('contact-submit');
+         if (!form) {
+             return;
+         }
+
+        function getFormDataObj() {
+            const fd = new FormData(form);
+            const obj = {};
+
+            for (const [k, v] of fd.entries()) {
+                obj[k] = v;
+            }
+
+            return obj;
+        }
+
+        function validateContactForm(fdObj) {
+            const errors = {};
+
+            if (!fdObj.firstName || !String(fdObj.firstName).trim()){
+                errors.firstName = ['First name is required.'];
+            }
+            if (!fdObj.lastName || !String(fdObj.lastName).trim()) {
+                errors.lastName = ['Last name is required.'];
+            }
+            if (!fdObj.email || !/^\S+@\S+\.\S+$/.test(fdObj.email)) {
+                errors.email = ['Please enter a valid email address.'];
+            }
+            if (!fdObj.messageContent || !String(fdObj.messageContent).trim()) {
+                errors.messageContent = ['Message is required.'];
+            }
+
+            return errors;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            FormUtils.clearErrors(form);
+
+            const data = getFormDataObj();
+            const clientErrors = validateContactForm(data);
+            if (Object.keys(clientErrors).length) {
+                FormUtils.showFieldErrors(form, clientErrors);
+                return;
+            }
+
+            if (submit) {
+                submit.disabled = true;
+                const originalText = submit.textContent;
+                submit.textContent = 'Sending...';
+
+                try {
+                    // Ensure EmailJS is loaded and initialized (will throw if loading fails)
+                    await ensureEmailjs();
+
+                    // Prepare template params
+                    const templateParams = {
+                        to_email: 'patriksam258@gmail.com',
+                        subject: 'New contact form submission from ' + (data.firstName || '') + ' ' + (data.lastName || ''),
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                        name: (data.firstName || '') + (data.lastName ? (' ' + data.lastName) : ''),
+                        from_email: data.email,
+                        message: data.messageContent,
+                        time: new Date().toLocaleString(),
+                    };
+
+                    // Send via EmailJS
+                    await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+
+                    alert('Message sent — thank you!');
+                    form.reset();
+                } catch (err) {
+                    console.error('Failed to send contact email', err);
+                    alert('Failed to send message. Please try again later.');
+                } finally {
+                    if (submit) {
+                        submit.disabled = false;
+                        submit.textContent = originalText;
+                    }
+                }
+            }
+        });
+     });
+ })();
