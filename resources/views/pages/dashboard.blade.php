@@ -10,9 +10,9 @@
                         </svg>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="tagDropdownButton">
-                        <li><a class="dropdown-item" href="#">Tag 1</a></li>
-                        <li><a class="dropdown-item" href="#">Tag 2</a></li>
-                        <li><a class="dropdown-item" href="#">Tag 3</a></li>
+                        <li><a class="dropdown-item" href="#">Thoughts</a></li>
+                        <li><a class="dropdown-item" href="#">Tasks</a></li>
+                        <li><a class="dropdown-item" href="#">Shopping</a></li>
                     </ul>
                 </div>
                 <input type="text" class="form-control border-0 shadow-none" placeholder="Start typing…">
