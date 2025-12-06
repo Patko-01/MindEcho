@@ -1,12 +1,13 @@
 <x-layout>
     <div class="container p-5 w-50">
         <h2>Edit Profile</h2>
-        <form action="{{ route('profile.update') }}" method="POST">
+        <form id="profile-edit-form" action="{{ route('profile.update') }}" method="POST">
             @csrf <!-- CSRF token for security (cross site request forgery) -->
 
             <div class="mb-3 mt-4">
-                <label for="loginPersonName1" class="form-label">Name</label>
-                <input type="text" value="{{ old('name', auth()->user()?->name) }}" name="name" class="form-control" id="loginPersonName1" aria-describedby="personNameHelp" required>
+                <label for="name" class="form-label">Name</label>
+                <input type="text" value="{{ old('name', auth()->user()?->name) }}" name="name" class="form-control" id="name" aria-describedby="personNameHelp" required>
+                <div class="field-error text-danger small mt-1" data-for="name"></div>
             </div>
             <div class="mb-3">
                 <label for="loginPersonEmail1" class="form-label">Email</label>
@@ -15,9 +16,10 @@
             <div class="mb-3">
                 <label for="loginPersonPassword1" class="form-label">New password (optional)</label>
                 <input type="password" name="password" class="form-control" id="loginPersonPassword1" aria-describedby="personNewOptionalPasswordHelp">
+                <div class="field-error text-danger small mt-1" data-for="password"></div>
             </div>
 
-            <button type="submit" class="midBtn btn btn-dark w-100">Save Changes</button>
+            <button id="profile-submit" type="submit" class="midBtn btn btn-dark w-100">Save Changes</button>
         </form>
 
         <div class="text-center mt-3">
