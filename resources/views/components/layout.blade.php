@@ -13,17 +13,20 @@
 @endif
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('home') }}">Mindecho</a>
+        <div class="d-flex align-items-center">
+            <a class="navbar-brand mb-0" href="{{ route('home') }}">Mindecho</a>
             @auth
-                <span class="me-2">Welcome, {{ auth()->user()->name }}!</span>
-
-                <a class="nav-link" href="{{ route('show.profile.edit') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-                    </svg>
-                </a>
+                <div class="d-inline-flex flex-nowrap align-items-center ms-2">
+                    <span class="me-2 mb-0">Welcome, {{ optional(auth()->user())->name }}!</span>
+                    <a class="nav-link p-0 d-inline-block" href="{{ route('show.profile.edit') }}" aria-label="Edit profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                        </svg>
+                    </a>
+                </div>
             @endauth
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -67,7 +70,7 @@
 </main>
 
 <div class="container">
-    <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 border-top">
+    <footer class="row row-cols-1 row-cols-md-5 py-5 border-top">
         <div class="col mb-3">
             <a href="{{ route('home') }}" class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none" aria-label="Bootstrap">
                 <span class="navbar-brand">Mindecho</span>
