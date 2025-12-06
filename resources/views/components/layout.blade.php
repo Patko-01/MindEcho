@@ -102,7 +102,7 @@
         <div class="col mb-3"><h5>Contact</h5>
             <ul class="nav flex-column">
                 <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">support@mindecho.ai</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Support</a></li>
+                <li class="nav-item mb-2"><a href="{{ route('contact') }}" class="nav-link p-0 text-body-secondary">Support</a></li>
             </ul>
         </div>
     </footer>
