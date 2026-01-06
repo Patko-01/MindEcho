@@ -167,6 +167,10 @@ form .midBtn {
     }
 }
 
+.about-section {
+    margin-top: 3.5rem;
+}
+
 @media (min-width: 768px) {
     /* Make each about column a vertical flex container to push the icon to the bottom */
     .about-section .col-md-4 {
@@ -181,7 +185,7 @@ form .midBtn {
     opacity: 0.9;
     display: block;
     align-self: center;
-    margin-top: auto !important; /* push icon to the bottom of the column and override Bootstrap's mt-5 */
+    margin-top: auto !important; /* push icon to the bottom of the column */
 }
 
 .dashboard-container-part {
@@ -247,4 +251,9 @@ form .midBtn {
 
 .fade-smooth.show {
     opacity: 1;
+}
+
+.mw-text {
+    max-width: 32rem;
+    margin-bottom: 2.5rem;
 }

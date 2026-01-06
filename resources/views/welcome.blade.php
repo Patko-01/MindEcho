@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="container mt-5 mb-5 p-5">
+    <div class="container mt-5 p-5">
         <div class="float-start intro">
             <h1 class="heading mb-3"><strong>Your all in one thought diary.</strong></h1>
             <h5 class="subheading text-muted mb-3">Track your mood, journal your thoughts, practice mindfulness, set daily goals, and build healthier habits with private, secure entries.</h5>
@@ -32,9 +32,9 @@
         <img src="{{ Vite::asset('resources/assets/integral.png') }}" class="intro-image" alt="decorative">
     </div>
 
-    <div class="container second mb-5 p-5">
+    <div class="container second p-5">
         <h1>About MindEcho - Your Daily Companion</h1>
-        <div class="row mt-5 about-section">
+        <div class="row about-section">
             <div class="col-md-4 mb-5">
                 <h5>Manage Stress Effectively</h5>
                 <p class="heading-text lead">
@@ -43,7 +43,7 @@
                     using Lorem Ipsum is that it has a more-or-less normal distribution
                     of letters.
                 </p>
-                <img src="{{ Vite::asset('resources/assets/icon1.png') }}" class="about-icon mt-5" alt="icon">
+                <img src="{{ Vite::asset('resources/assets/icon1.png') }}" class="about-icon" alt="icon">
             </div>
             <div class="col-md-4 mb-5">
                 <h5>Keep Your Thoughts Nearby</h5>
@@ -53,7 +53,7 @@
                     ut ipsum molestie mattis. Sed tempor et neque eget luctus.
                     Suspendisse. asdfasdfasd a
                 </p>
-                <img src="{{ Vite::asset('resources/assets/icon2.png') }}" class="about-icon mt-5" alt="icon">
+                <img src="{{ Vite::asset('resources/assets/icon2.png') }}" class="about-icon" alt="icon">
             </div>
             <div class="col-md-4 mb-5">
                 <h5>Brainstorm Your Ideas</h5>
@@ -63,7 +63,35 @@
                     elit. Pellentesque pharetra lectus consectetur nulla feugiat,
                     non mattis urna fermentum.
                 </p>
-                <img src="{{ Vite::asset('resources/assets/icon3.png') }}" class="about-icon mt-5" alt="icon">
+                <img src="{{ Vite::asset('resources/assets/icon3.png') }}" class="about-icon" alt="icon">
+            </div>
+        </div>
+    </div>
+
+    <div class="container p-5 mb-5">
+        <h1>Racing Thoughts?</h1>
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <h5>Focus</h5>
+                <p class="heading-text lead mw-text">
+                    Focus isn’t about forcing your attention to stay in one place.
+                    It’s about gently returning to what matters when your mind inevitably drifts.
+                    Each return strengthens your ability to stay present without tension or frustration.
+                </p>
+                <h5>Clarity</h5>
+                <p class="heading-text lead mw-text">
+                    When thoughts slow down, patterns begin to emerge. You start to notice which ideas deserve energy and which can be released.
+                    Clarity comes from creating space, not from trying to think harder or faster.
+                </p>
+                <h5>Mindfulness</h5>
+                <p class="heading-text lead mw-text">
+                    Mindfulness invites you to observe your thoughts without judgment.
+                    Instead of reacting automatically, you learn to pause, breathe, and respond with intention.
+                    Over time, this practice builds a calmer and more grounded perspective.
+                </p>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="{{ Vite::asset('resources/assets/head.jpg') }}" alt="decorative image">
             </div>
         </div>
     </div>

@@ -48,6 +48,7 @@ class FormHandler {
     // options: { formId, submitBtnId, validators: { fieldName: fn(formData|string) => [msgs] }, preparePayload(formData) }
     constructor(options) {
         this.form = document.getElementById(options.formId);
+
         if (!this.form) {
             return;
         }
@@ -63,6 +64,7 @@ class FormHandler {
 
     _attachInputListeners() {
         const names = Object.keys(this._validators);
+
         if (!names.length) {
             return;
         }
@@ -181,27 +183,49 @@ class FormHandler {
     }
 }
 
-// --- Instantiate handlers for the two forms ---
-
 // Registration form
 new FormHandler({
     formId: 'register-form',
     submitBtnId: 'register-submit',
     validators: {
         name(formData) {
-            const v = (formData instanceof FormData ? (formData.get('name') || '') : formData).trim ? (formData.get('name') || '').trim() : (formData.name || '');
+            let v;
+
+            if (formData instanceof FormData) {
+                v = (formData.get('name') || '').trim();
+            } else if (formData && typeof formData === 'object' && 'name' in formData) {
+                v = String(formData.name || '').trim();
+            } else {
+                v = String(formData || '').trim();
+            }
+
             const msgs = [];
-            if (!v) msgs.push('Name is required.');
+
+            if (!v) {
+                msgs.push('Name is required.');
+            }
+
             return msgs;
         },
         email(formData) {
-            const v = (formData instanceof FormData ? (formData.get('email') || '') : formData).trim ? (formData.get('email') || '').trim() : (formData.email || '');
+            let v;
+
+            if (formData instanceof FormData) {
+                v = (formData.get('email') || '').trim();
+            } else if (formData && typeof formData === 'object' && 'email' in formData) {
+                v = String(formData.name || '').trim();
+            } else {
+                v = String(formData || '').trim();
+            }
+
             const msgs = [];
+
             if (!v) {
                 msgs.push('Email is required.');
             } else if (!/^\S+@\S+\.\S+$/.test(v)) {
                 msgs.push('Please enter a valid email address.');
             }
+
             return msgs;
         },
         password(formData) {
@@ -321,6 +345,7 @@ new FormHandler({
         // Start loading EmailJS in the background so it's ready by the time the user submits.
          const form = document.getElementById('contact-form');
          const submit = document.getElementById('contact-submit');
+
          if (!form) {
              return;
          }
