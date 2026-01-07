@@ -1,5 +1,21 @@
 import './bootstrap';
 
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.js-tag-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tagInput = document.querySelector('input[name="tag"]');
+            if (!tagInput) {
+                return;
+            }
+
+            const tagName = btn.textContent.trim();
+            if (tagInput.value !== tagName) {
+                tagInput.value = tagName;
+            }
+        });
+    });
+});
+
 function getCsrfToken(form) {
     const input = form.querySelector('input[name="_token"]');
     return input ? input.value : '';
