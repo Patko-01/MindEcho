@@ -1,163 +1,143 @@
 import './bootstrap';
 
-const FormUtils = {
-    getCsrfToken(form) {
-        const tokenInput = form.querySelector('input[name="_token"]');
-        return tokenInput ? tokenInput.value : '';
-    },
+// ============================================
+// Helper functions
+// ============================================
 
-    clearErrors(form) {
-        form.querySelectorAll('.field-error').forEach(el => el.textContent = '');
-        form.querySelectorAll('[aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
-    },
+function getCsrfToken(form) {
+    const input = form.querySelector('input[name="_token"]');
+    return input ? input.value : '';
+}
 
-    showFieldErrors(form, errors) {
-        for (const key in errors) {
-            const fieldErr = form.querySelector('.field-error[data-for="' + key + '"]');
-            const field = form.querySelector('[name="' + key + '"]');
+function clearErrors(form) {
+    form.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+    form.querySelectorAll('[aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
+}
 
-            const msgs = Array.isArray(errors[key]) ? errors[key] : [errors[key]];
+function showError(form, fieldName, message) {
+    const errorEl = form.querySelector('.field-error[data-for="' + fieldName + '"]');
+    const field = form.querySelector('[name="' + fieldName + '"]');
+    if (errorEl) errorEl.textContent = message;
+    if (field) field.setAttribute('aria-invalid', 'true');
+}
 
-            if (fieldErr) {
-                fieldErr.textContent = msgs.join(' ');
-            }
-            if (field) {
-                field.setAttribute('aria-invalid', 'true');
-            }
-        }
-    },
-
-    updateFieldUI(form, name, messages) {
-        const fieldErr = form.querySelector('.field-error[data-for="' + name + '"]');
-        const field = form.querySelector('[name="' + name + '"]');
-
-        if (fieldErr) {
-            fieldErr.textContent = messages.length ? messages.join(' ') : '';
-        }
-        if (field) {
-            if (messages.length) {
-                field.setAttribute('aria-invalid', 'true');
-            } else {
-                field.removeAttribute('aria-invalid');
-            }
-        }
+function showErrors(form, errors) {
+    for (const key in errors) {
+        const msgs = Array.isArray(errors[key]) ? errors[key] : [errors[key]];
+        showError(form, key, msgs.join(' '));
     }
-};
+}
 
-class FormHandler {
-    // options: { formId, submitBtnId, validators: { fieldName: fn(formData|string) => [msgs] }, preparePayload(formData) }
-    constructor(options) {
-        this.form = document.getElementById(options.formId);
+function clearFieldError(form, fieldName) {
+    const errorEl = form.querySelector('.field-error[data-for="' + fieldName + '"]');
+    const field = form.querySelector('[name="' + fieldName + '"]');
+    if (errorEl) errorEl.textContent = '';
+    if (field) field.removeAttribute('aria-invalid');
+}
 
-        if (!this.form) {
-            return;
-        }
+function formToObject(form) {
+    const obj = {};
+    new FormData(form).forEach((val, key) => obj[key] = val);
+    return obj;
+}
 
-        this.submitBtn = options.submitBtnId ? document.getElementById(options.submitBtnId) : null;
-        this._validators = options.validators || {};
-        this._preparePayload = options.preparePayload;
-        this._origBtnText = this.submitBtn ? this.submitBtn.textContent : '';
+// ============================================
+// Registration Form
+// ============================================
 
-        this._attachInputListeners();
-        this.form.addEventListener('submit', this._onSubmit.bind(this));
+const registerForm = document.getElementById('register-form');
+if (registerForm) {
+    const submitBtn = document.getElementById('register-submit');
+
+    // Validation functions
+    function validateName(value) {
+        if (!value.trim()) return 'Name is required.';
+        return '';
     }
 
-    _attachInputListeners() {
-        const names = Object.keys(this._validators);
-
-        if (!names.length) {
-            return;
-        }
-
-        const selector = names.map(n => 'input[name="' + n + '"]').join(', ');
-        const inputs = this.form.querySelectorAll(selector);
-
-        inputs.forEach(inp => {
-            inp.addEventListener('input', this._onInputChange.bind(this));
-            inp.addEventListener('blur', this._onInputChange.bind(this));
-        });
+    function validateEmail(value) {
+        if (!value.trim()) return 'Email is required.';
+        if (!/^\S+@\S+\.\S+$/.test(value)) return 'Please enter a valid email address.';
+        return '';
     }
 
-    _onInputChange(e) {
-        const fd = new FormData(this.form);
-        const name = e.target.name;
-        const msgs = this._validateField(name, fd);
-
-        FormUtils.updateFieldUI(this.form, name, msgs);
-
-        // if password changes, re-validate confirmation when present
-        if (name === 'password' && this._validators['password_confirmation']) {
-            const confirmMsgs = this._validateField('password_confirmation', fd);
-            FormUtils.updateFieldUI(this.form, 'password_confirmation', confirmMsgs);
-        }
+    function validatePassword(value) {
+        if (!value) return 'Password is required.';
+        if (value.length < 8) return 'Password must be at least 8 characters.';
+        return '';
     }
 
-    _validateField(name, formData) {
-        const validator = this._validators[name];
-
-        if (typeof validator === 'function') {
-            try {
-                return validator(formData);
-            } catch (err) {
-                // If validator expects a string value instead of FormData, try that
-                const val = formData instanceof FormData ? (formData.get(name) || '') : (formData || '');
-                return validator(val) || [];
-            }
-        }
-        return [];
+    function validatePasswordConfirmation(password, confirmation) {
+        if (confirmation !== password) return 'Passwords do not match.';
+        return '';
     }
 
-    _validateAll(formData) {
+    function validateRegisterForm(data) {
         const errors = {};
-        for (const name in this._validators) {
-            const msgs = this._validateField(name, formData);
-            if (msgs && msgs.length) {
-                errors[name] = msgs;
-            }
-        }
+        const nameErr = validateName(data.name || '');
+        const emailErr = validateEmail(data.email || '');
+        const passwordErr = validatePassword(data.password || '');
+        const confirmErr = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
+        if (nameErr) errors.name = nameErr;
+        if (emailErr) errors.email = emailErr;
+        if (passwordErr) errors.password = passwordErr;
+        if (confirmErr) errors.password_confirmation = confirmErr;
         return errors;
     }
 
-    async _onSubmit(e) {
+    // Real-time validation on input/blur
+    registerForm.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', () => {
+            const data = formToObject(registerForm);
+            const name = input.name;
+            let error = '';
+
+            if (name === 'name') error = validateName(data.name || '');
+            if (name === 'email') error = validateEmail(data.email || '');
+            if (name === 'password') {
+                error = validatePassword(data.password || '');
+                // Also re-validate confirmation when password changes
+                const confirmErr = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
+                if (confirmErr) showError(registerForm, 'password_confirmation', confirmErr);
+                else clearFieldError(registerForm, 'password_confirmation');
+            }
+            if (name === 'password_confirmation') error = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
+
+            if (error) showError(registerForm, name, error);
+            else clearFieldError(registerForm, name);
+        });
+    });
+
+    // Form submit
+    registerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        FormUtils.clearErrors(this.form);
+        clearErrors(registerForm);
 
-        const formData = new FormData(this.form);
-        const clientErrors = this._validateAll(formData);
+        const data = formToObject(registerForm);
+        const errors = validateRegisterForm(data);
 
-        if (Object.keys(clientErrors).length > 0) {
-            FormUtils.showFieldErrors(this.form, clientErrors);
+        if (Object.keys(errors).length) {
+            showErrors(registerForm, errors);
             return;
         }
 
-        const payload = this._preparePayload ? this._preparePayload(formData) : this._defaultPayload(formData);
-
-        if (this.submitBtn) {
-            this.submitBtn.disabled = true;
-        }
+        if (submitBtn) submitBtn.disabled = true;
 
         try {
-            const res = await fetch(this.form.action, {
+            const res = await fetch(registerForm.action, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': FormUtils.getCsrfToken(this.form)
+                    'X-CSRF-TOKEN': getCsrfToken(registerForm)
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(data)
             });
 
-            const ct = res.headers.get('content-type') || '';
-            if (res.status === 422 || ct.indexOf('application/json') !== -1) {
-                const data = await res.json().catch(() => ({}));
-                if (res.status === 422 && data.errors) {
-                    FormUtils.showFieldErrors(this.form, data.errors);
-                } else if (data.redirect) {
-                    window.location.href = data.redirect;
-                } else if (res.ok) {
-                    window.location.reload();
-                }
+            if (res.status === 422) {
+                const json = await res.json().catch(() => ({}));
+                if (json.errors) showErrors(registerForm, json.errors);
             } else if (res.redirected) {
                 window.location.href = res.url;
             } else if (res.ok) {
@@ -166,267 +146,189 @@ class FormHandler {
         } catch (err) {
             console.error('Form submit failed', err);
         } finally {
-            if (this.submitBtn) {
-                this.submitBtn.disabled = false;
-                this.submitBtn.textContent = this._origBtnText;
-            }
+            if (submitBtn) submitBtn.disabled = false;
         }
-    }
-
-    _defaultPayload(formData) {
-        // include all form fields
-        const obj = {};
-        for (const pair of formData.entries()) {
-            obj[pair[0]] = pair[1];
-        }
-        return obj;
-    }
+    });
 }
 
-// Registration form
-new FormHandler({
-    formId: 'register-form',
-    submitBtnId: 'register-submit',
-    validators: {
-        name(formData) {
-            let v;
+// ============================================
+// Profile Edit Form
+// ============================================
 
-            if (formData instanceof FormData) {
-                v = (formData.get('name') || '').trim();
-            } else if (formData && typeof formData === 'object' && 'name' in formData) {
-                v = String(formData.name || '').trim();
-            } else {
-                v = String(formData || '').trim();
-            }
+const profileForm = document.getElementById('profile-edit-form');
+if (profileForm) {
+    const submitBtn = document.getElementById('profile-submit');
 
-            const msgs = [];
-
-            if (!v) {
-                msgs.push('Name is required.');
-            }
-
-            return msgs;
-        },
-        email(formData) {
-            let v;
-
-            if (formData instanceof FormData) {
-                v = (formData.get('email') || '').trim();
-            } else if (formData && typeof formData === 'object' && 'email' in formData) {
-                v = String(formData.name || '').trim();
-            } else {
-                v = String(formData || '').trim();
-            }
-
-            const msgs = [];
-
-            if (!v) {
-                msgs.push('Email is required.');
-            } else if (!/^\S+@\S+\.\S+$/.test(v)) {
-                msgs.push('Please enter a valid email address.');
-            }
-
-            return msgs;
-        },
-        password(formData) {
-            const v = formData instanceof FormData ? (formData.get('password') || '') : (formData.password || '');
-            const msgs = [];
-            if (!v) {
-                msgs.push('Password is required.');
-            } else if (String(v).length < 8) {
-                msgs.push('Password must be at least 8 characters.');
-            }
-            return msgs;
-        },
-        password_confirmation(formData) {
-            const pw = formData instanceof FormData ? (formData.get('password') || '') : (formData.password || '');
-            const val = formData instanceof FormData ? (formData.get('password_confirmation') || '') : (formData.password_confirmation || '');
-            const msgs = [];
-            if (val !== pw) msgs.push('Passwords do not match.');
-            return msgs;
-        }
-    },
-    preparePayload(formData) {
-        return {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            password: formData.get('password'),
-            password_confirmation: formData.get('password_confirmation')
-        };
+    function validateProfileName(value) {
+        if (!value.trim()) return 'Name is required.';
+        return '';
     }
-});
 
-// Profile edit form
-new FormHandler({
-    formId: 'profile-edit-form',
-    submitBtnId: 'profile-submit',
-    validators: {
-        name(formData) {
-            const v = formData instanceof FormData ? (formData.get('name') || '') : (formData.name || '');
-            const msgs = [];
-            if (!v || !String(v).trim()) {
-                msgs.push('Name is required.');
-            }
-            return msgs;
-        },
-        password(formData) {
-            const v = formData instanceof FormData ? (formData.get('password') || '') : (formData.password || '');
-            const msgs = [];
-            if (v && String(v).length < 8) {
-                msgs.push('Password must be at least 8 characters.');
-            }
-            return msgs;
-        }
-    },
-    preparePayload(formData) {
-        const payload = { name: formData.get('name') };
-        const pw = formData.get('password');
-        if (pw) payload.password = pw;
-        return payload;
+    function validateProfilePassword(value) {
+        if (value && value.length < 8) return 'Password must be at least 8 characters.';
+        return '';
     }
-});
 
-// Contact form handler using EmailJS
-(function() {
+    function validateProfileForm(data) {
+        const errors = {};
+        const nameErr = validateProfileName(data.name || '');
+        const passwordErr = validateProfilePassword(data.password || '');
+        if (nameErr) errors.name = nameErr;
+        if (passwordErr) errors.password = passwordErr;
+        return errors;
+    }
+
+    // Real-time validation
+    profileForm.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', () => {
+            const data = formToObject(profileForm);
+            const name = input.name;
+            let error = '';
+
+            if (name === 'name') error = validateProfileName(data.name || '');
+            if (name === 'password') error = validateProfilePassword(data.password || '');
+
+            if (error) showError(profileForm, name, error);
+            else clearFieldError(profileForm, name);
+        });
+    });
+
+    // Form submit
+    profileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearErrors(profileForm);
+
+        const data = formToObject(profileForm);
+        const errors = validateProfileForm(data);
+
+        if (Object.keys(errors).length) {
+            showErrors(profileForm, errors);
+            return;
+        }
+
+        // Only send password if provided
+        const payload = { name: data.name };
+        if (data.password) payload.password = data.password;
+
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+            const res = await fetch(profileForm.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': getCsrfToken(profileForm)
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.status === 422) {
+                const json = await res.json().catch(() => ({}));
+                if (json.errors) showErrors(profileForm, json.errors);
+            } else if (res.redirected) {
+                window.location.href = res.url;
+            } else if (res.ok) {
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error('Form submit failed', err);
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    });
+}
+
+// ============================================
+// Contact Form (EmailJS)
+// ============================================
+
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
     const EMAILJS_SERVICE_ID = 'service_bl4y65j';
     const EMAILJS_TEMPLATE_ID = 'template_3bdyys8';
     const EMAILJS_USER_ID = 'f6honLRkEsay40gZ0';
 
-    // Single, promise-based loader + initializer for EmailJS.
-    // Usage: await ensureEmailjs(); // resolves when window.emailjs is available and initialized (if key provided)
-    let _emailjsReady = null;
+    const submitBtn = document.getElementById('contact-submit');
+    let emailjsLoaded = false;
 
-    function ensureEmailjs() {
-        if (typeof window.emailjs !== 'undefined' && window.emailjs.send) {
-            // already present - ensure init was called if user provided a key
-            try {
-                if (EMAILJS_USER_ID && window.emailjs.init && !window.__emailjs_inited) {
+    // Load EmailJS script
+    function loadEmailJS() {
+        return new Promise((resolve, reject) => {
+            if (window.emailjs) {
+                if (!emailjsLoaded) {
                     window.emailjs.init(EMAILJS_USER_ID);
-                    window.__emailjs_inited = true;
+                    emailjsLoaded = true;
                 }
-            } catch (e) {
-                console.warn('EmailJS init failed or already initialized', e);
-            }
-            return Promise.resolve(window.emailjs);
-        }
-
-        if (_emailjsReady) {
-            return _emailjsReady;
-        }
-
-        _emailjsReady = new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js';
-            s.async = true;
-            s.onload = () => {
-                try {
-                    if (EMAILJS_USER_ID && window.emailjs && window.emailjs.init) {
-                        window.emailjs.init(EMAILJS_USER_ID);
-                        window.__emailjs_inited = true;
-                    }
-                } catch (e) {
-                    console.warn('EmailJS init failed', e);
-                }
-                if (typeof window.emailjs !== 'undefined' && window.emailjs.send) {
-                    resolve(window.emailjs);
-                } else {
-                    reject(new Error('EmailJS loaded but `emailjs` object missing'));
-                }
-            };
-            s.onerror = () => reject(new Error('Failed to load EmailJS SDK'));
-            document.head.appendChild(s);
-        });
-
-        return _emailjsReady;
-    }
-
-    // Wait for DOM ready to attach handlers
-    document.addEventListener('DOMContentLoaded', function() {
-        // Start loading EmailJS in the background so it's ready by the time the user submits.
-         const form = document.getElementById('contact-form');
-         const submit = document.getElementById('contact-submit');
-
-         if (!form) {
-             return;
-         }
-
-        function getFormDataObj() {
-            const fd = new FormData(form);
-            const obj = {};
-
-            for (const [k, v] of fd.entries()) {
-                obj[k] = v;
-            }
-
-            return obj;
-        }
-
-        function validateContactForm(fdObj) {
-            const errors = {};
-
-            if (!fdObj.firstName || !String(fdObj.firstName).trim()){
-                errors.firstName = ['First name is required.'];
-            }
-            if (!fdObj.lastName || !String(fdObj.lastName).trim()) {
-                errors.lastName = ['Last name is required.'];
-            }
-            if (!fdObj.email || !/^\S+@\S+\.\S+$/.test(fdObj.email)) {
-                errors.email = ['Please enter a valid email address.'];
-            }
-            if (!fdObj.messageContent || !String(fdObj.messageContent).trim()) {
-                errors.messageContent = ['Message is required.'];
-            }
-
-            return errors;
-        }
-
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            FormUtils.clearErrors(form);
-
-            const data = getFormDataObj();
-            const clientErrors = validateContactForm(data);
-            if (Object.keys(clientErrors).length) {
-                FormUtils.showFieldErrors(form, clientErrors);
+                resolve();
                 return;
             }
 
-            if (submit) {
-                submit.disabled = true;
-                const originalText = submit.textContent;
-                submit.textContent = 'Sending...';
-
-                try {
-                    // Ensure EmailJS is loaded and initialized (will throw if loading fails)
-                    await ensureEmailjs();
-
-                    // Prepare template params
-                    const templateParams = {
-                        to_email: 'patriksam258@gmail.com',
-                        subject: 'New contact form submission from ' + (data.firstName || '') + ' ' + (data.lastName || ''),
-                        first_name: data.firstName,
-                        last_name: data.lastName,
-                        name: (data.firstName || '') + (data.lastName ? (' ' + data.lastName) : ''),
-                        from_email: data.email,
-                        message: data.messageContent,
-                        time: new Date().toLocaleString(),
-                    };
-
-                    // Send via EmailJS
-                    await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-
-                    alert('Message sent — thank you!');
-                    form.reset();
-                } catch (err) {
-                    console.error('Failed to send contact email', err);
-                    alert('Failed to send message. Please try again later.');
-                } finally {
-                    if (submit) {
-                        submit.disabled = false;
-                        submit.textContent = originalText;
-                    }
-                }
-            }
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js';
+            script.async = true;
+            script.onload = () => {
+                window.emailjs.init(EMAILJS_USER_ID);
+                emailjsLoaded = true;
+                resolve();
+            };
+            script.onerror = () => reject(new Error('Failed to load EmailJS'));
+            document.head.appendChild(script);
         });
-     });
- })();
+    }
+
+    function validateContactForm(data) {
+        const errors = {};
+        if (!data.firstName || !data.firstName.trim()) errors.firstName = 'First name is required.';
+        if (!data.lastName || !data.lastName.trim()) errors.lastName = 'Last name is required.';
+        if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) errors.email = 'Please enter a valid email address.';
+        if (!data.messageContent || !data.messageContent.trim()) errors.messageContent = 'Message is required.';
+        return errors;
+    }
+
+    contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearErrors(contactForm);
+
+        const data = formToObject(contactForm);
+        const errors = validateContactForm(data);
+
+        if (Object.keys(errors).length) {
+            showErrors(contactForm, errors);
+            return;
+        }
+
+        const originalText = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+        }
+
+        try {
+            await loadEmailJS();
+
+            await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_email: 'patriksam258@gmail.com',
+                subject: 'New contact form submission from ' + data.firstName + ' ' + data.lastName,
+                first_name: data.firstName,
+                last_name: data.lastName,
+                name: data.firstName + ' ' + data.lastName,
+                from_email: data.email,
+                message: data.messageContent,
+                time: new Date().toLocaleString()
+            });
+
+            alert('Message sent — thank you!');
+            contactForm.reset();
+        } catch (err) {
+            console.error('Failed to send contact email', err);
+            alert('Failed to send message. Please try again later.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+    });
+}

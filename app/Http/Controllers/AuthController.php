@@ -25,6 +25,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        $validated['models_id'] = 1;
+
         $user = User::create($validated);
 
         Auth::login($user);
