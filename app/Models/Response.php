@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AiQuestion extends Model
+class Response extends Model
 {
-    protected $fillable = ['ai_question'];
+    protected $fillable = ['entry_id', 'content'];
 
-    public function entry(): BelongsTo
+    public function entries(): BelongsTo
     {
         return $this->belongsTo(Entry::class);
     }

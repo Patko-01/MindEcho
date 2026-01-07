@@ -12,11 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('entries', function (Blueprint $table) {
-            // make entry_id a primary-foreign key (unsigned big integer) referencing ai_questions.question_id
-            $table->unsignedBigInteger('entry_id');
-            $table->primary('entry_id');
-            $table->foreign('entry_id')->references('question_id')->on('ai_questions')->onDelete('cascade');
-
+            $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('entry_title');
             $table->string('tag');

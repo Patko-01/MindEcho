@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ai_questions', function (Blueprint $table) {
-            $table->id('question_id');
-            $table->text('ai_question');
+        Schema::create('responses', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('entry_id')->constrained()->onDelete('cascade');
+            $table->text('content');
             $table->timestamps();
         });
     }
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ai_questions');
+        Schema::dropIfExists('responses');
     }
 };

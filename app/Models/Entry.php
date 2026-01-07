@@ -8,15 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Entry extends Model
 {
-    protected $fillable = ['entry_title', 'tag', 'content'];
+    protected $fillable = ['user_id', 'entry_title', 'tag', 'content'];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function aiQuestion(): HasMany
+    public function response(): HasMany
     {
-        return $this->hasMany(AiQuestion::class);
+        return $this->hasMany(Response::class);
     }
 }
