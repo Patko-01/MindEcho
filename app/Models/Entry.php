@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Entry extends Model
 {
     protected $fillable = ['entry_title', 'tag', 'content'];
-    //
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

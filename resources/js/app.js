@@ -1,9 +1,5 @@
 import './bootstrap';
 
-// ============================================
-// Helper functions
-// ============================================
-
 function getCsrfToken(form) {
     const input = form.querySelector('input[name="_token"]');
     return input ? input.value : '';
@@ -17,8 +13,12 @@ function clearErrors(form) {
 function showError(form, fieldName, message) {
     const errorEl = form.querySelector('.field-error[data-for="' + fieldName + '"]');
     const field = form.querySelector('[name="' + fieldName + '"]');
-    if (errorEl) errorEl.textContent = message;
-    if (field) field.setAttribute('aria-invalid', 'true');
+    if (errorEl) {
+        errorEl.textContent = message;
+    }
+    if (field) {
+        field.setAttribute('aria-invalid', 'true');
+    }
 }
 
 function showErrors(form, errors) {
@@ -31,8 +31,12 @@ function showErrors(form, errors) {
 function clearFieldError(form, fieldName) {
     const errorEl = form.querySelector('.field-error[data-for="' + fieldName + '"]');
     const field = form.querySelector('[name="' + fieldName + '"]');
-    if (errorEl) errorEl.textContent = '';
-    if (field) field.removeAttribute('aria-invalid');
+    if (errorEl) {
+        errorEl.textContent = '';
+    }
+    if (field) {
+        field.removeAttribute('aria-invalid');
+    }
 }
 
 function formToObject(form) {
@@ -41,34 +45,42 @@ function formToObject(form) {
     return obj;
 }
 
-// ============================================
-// Registration Form
-// ============================================
-
 const registerForm = document.getElementById('register-form');
 if (registerForm) {
     const submitBtn = document.getElementById('register-submit');
 
     // Validation functions
     function validateName(value) {
-        if (!value.trim()) return 'Name is required.';
+        if (!value.trim()) {
+            return 'Name is required.';
+        }
         return '';
     }
 
     function validateEmail(value) {
-        if (!value.trim()) return 'Email is required.';
-        if (!/^\S+@\S+\.\S+$/.test(value)) return 'Please enter a valid email address.';
+        if (!value.trim()) {
+            return 'Email is required.';
+        }
+        if (!/^\S+@\S+\.\S+$/.test(value)) {
+            return 'Please enter a valid email address.';
+        }
         return '';
     }
 
     function validatePassword(value) {
-        if (!value) return 'Password is required.';
-        if (value.length < 8) return 'Password must be at least 8 characters.';
+        if (!value) {
+            return 'Password is required.';
+        }
+        if (value.length < 8) {
+            return 'Password must be at least 8 characters.';
+        }
         return '';
     }
 
     function validatePasswordConfirmation(password, confirmation) {
-        if (confirmation !== password) return 'Passwords do not match.';
+        if (confirmation !== password) {
+            return 'Passwords do not match.';
+        }
         return '';
     }
 
@@ -78,10 +90,18 @@ if (registerForm) {
         const emailErr = validateEmail(data.email || '');
         const passwordErr = validatePassword(data.password || '');
         const confirmErr = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
-        if (nameErr) errors.name = nameErr;
-        if (emailErr) errors.email = emailErr;
-        if (passwordErr) errors.password = passwordErr;
-        if (confirmErr) errors.password_confirmation = confirmErr;
+        if (nameErr) {
+            errors.name = nameErr;
+        }
+        if (emailErr) {
+            errors.email = emailErr;
+        }
+        if (passwordErr) {
+            errors.password = passwordErr;
+        }
+        if (confirmErr) {
+            errors.password_confirmation = confirmErr;
+        }
         return errors;
     }
 
@@ -92,19 +112,32 @@ if (registerForm) {
             const name = input.name;
             let error = '';
 
-            if (name === 'name') error = validateName(data.name || '');
-            if (name === 'email') error = validateEmail(data.email || '');
+            if (name === 'name') {
+                error = validateName(data.name || '');
+            }
+            if (name === 'email') {
+                error = validateEmail(data.email || '');
+            }
             if (name === 'password') {
                 error = validatePassword(data.password || '');
-                // Also re-validate confirmation when password changes
                 const confirmErr = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
-                if (confirmErr) showError(registerForm, 'password_confirmation', confirmErr);
-                else clearFieldError(registerForm, 'password_confirmation');
+                if (confirmErr) {
+                    showError(registerForm, 'password_confirmation', confirmErr);
+                }
+                else {
+                    clearFieldError(registerForm, 'password_confirmation');
+                }
             }
-            if (name === 'password_confirmation') error = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
+            if (name === 'password_confirmation') {
+                error = validatePasswordConfirmation(data.password || '', data.password_confirmation || '');
+            }
 
-            if (error) showError(registerForm, name, error);
-            else clearFieldError(registerForm, name);
+            if (error) {
+                showError(registerForm, name, error);
+            }
+            else {
+                clearFieldError(registerForm, name);
+            }
         });
     });
 
@@ -121,7 +154,9 @@ if (registerForm) {
             return;
         }
 
-        if (submitBtn) submitBtn.disabled = true;
+        if (submitBtn) {
+            submitBtn.disabled = true;
+        }
 
         try {
             const res = await fetch(registerForm.action, {
@@ -137,7 +172,9 @@ if (registerForm) {
 
             if (res.status === 422) {
                 const json = await res.json().catch(() => ({}));
-                if (json.errors) showErrors(registerForm, json.errors);
+                if (json.errors) {
+                    showErrors(registerForm, json.errors);
+                }
             } else if (res.redirected) {
                 window.location.href = res.url;
             } else if (res.ok) {
@@ -146,26 +183,28 @@ if (registerForm) {
         } catch (err) {
             console.error('Form submit failed', err);
         } finally {
-            if (submitBtn) submitBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
         }
     });
 }
-
-// ============================================
-// Profile Edit Form
-// ============================================
 
 const profileForm = document.getElementById('profile-edit-form');
 if (profileForm) {
     const submitBtn = document.getElementById('profile-submit');
 
     function validateProfileName(value) {
-        if (!value.trim()) return 'Name is required.';
+        if (!value.trim()) {
+            return 'Name is required.';
+        }
         return '';
     }
 
     function validateProfilePassword(value) {
-        if (value && value.length < 8) return 'Password must be at least 8 characters.';
+        if (value && value.length < 8) {
+            return 'Password must be at least 8 characters.';
+        }
         return '';
     }
 
@@ -173,8 +212,12 @@ if (profileForm) {
         const errors = {};
         const nameErr = validateProfileName(data.name || '');
         const passwordErr = validateProfilePassword(data.password || '');
-        if (nameErr) errors.name = nameErr;
-        if (passwordErr) errors.password = passwordErr;
+        if (nameErr) {
+            errors.name = nameErr;
+        }
+        if (passwordErr) {
+            errors.password = passwordErr;
+        }
         return errors;
     }
 
@@ -185,11 +228,19 @@ if (profileForm) {
             const name = input.name;
             let error = '';
 
-            if (name === 'name') error = validateProfileName(data.name || '');
-            if (name === 'password') error = validateProfilePassword(data.password || '');
+            if (name === 'name') {
+                error = validateProfileName(data.name || '');
+            }
+            if (name === 'password') {
+                error = validateProfilePassword(data.password || '');
+            }
 
-            if (error) showError(profileForm, name, error);
-            else clearFieldError(profileForm, name);
+            if (error) {
+                showError(profileForm, name, error);
+            }
+            else {
+                clearFieldError(profileForm, name);
+            }
         });
     });
 
@@ -208,9 +259,13 @@ if (profileForm) {
 
         // Only send password if provided
         const payload = { name: data.name };
-        if (data.password) payload.password = data.password;
+        if (data.password) {
+            payload.password = data.password;
+        }
 
-        if (submitBtn) submitBtn.disabled = true;
+        if (submitBtn) {
+            submitBtn.disabled = true;
+        }
 
         try {
             const res = await fetch(profileForm.action, {
@@ -226,7 +281,9 @@ if (profileForm) {
 
             if (res.status === 422) {
                 const json = await res.json().catch(() => ({}));
-                if (json.errors) showErrors(profileForm, json.errors);
+                if (json.errors) {
+                    showErrors(profileForm, json.errors);
+                }
             } else if (res.redirected) {
                 window.location.href = res.url;
             } else if (res.ok) {
@@ -235,14 +292,12 @@ if (profileForm) {
         } catch (err) {
             console.error('Form submit failed', err);
         } finally {
-            if (submitBtn) submitBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
         }
     });
 }
-
-// ============================================
-// Contact Form (EmailJS)
-// ============================================
 
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
@@ -280,10 +335,18 @@ if (contactForm) {
 
     function validateContactForm(data) {
         const errors = {};
-        if (!data.firstName || !data.firstName.trim()) errors.firstName = 'First name is required.';
-        if (!data.lastName || !data.lastName.trim()) errors.lastName = 'Last name is required.';
-        if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) errors.email = 'Please enter a valid email address.';
-        if (!data.messageContent || !data.messageContent.trim()) errors.messageContent = 'Message is required.';
+        if (!data.firstName || !data.firstName.trim()) {
+            errors.firstName = 'First name is required.';
+        }
+        if (!data.lastName || !data.lastName.trim()) {
+            errors.lastName = 'Last name is required.';
+        }
+        if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) {
+            errors.email = 'Please enter a valid email address.';
+        }
+        if (!data.messageContent || !data.messageContent.trim()) {
+            errors.messageContent = 'Message is required.';
+        }
         return errors;
     }
 
