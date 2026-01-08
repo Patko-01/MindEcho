@@ -1,6 +1,38 @@
 import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
+    (function(){
+        const textarea = document.getElementById('dashboard-input');
+        if (!textarea) {
+            return;
+        }
+
+        function resize() {
+            textarea.style.height = 'auto';
+            const taHeight = textarea.scrollHeight;
+            textarea.style.height = taHeight + 'px';
+        }
+
+        resize();
+        textarea.addEventListener('input', resize);
+        textarea.addEventListener('keydown', function(e){
+            // Ignore if user is composing IME input
+            if (e.isComposing) {
+                return;
+            }
+
+            if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                const form = textarea.closest('form');
+                if (!form) {
+                    return;
+                }
+                form.submit();
+            }
+        });
+        window.addEventListener('resize', resize);
+    })();
+
     document.querySelectorAll('.js-tag-toggle').forEach(btn => {
         btn.addEventListener('click', () => {
             const tagInput = document.querySelector('input[name="tag"]');

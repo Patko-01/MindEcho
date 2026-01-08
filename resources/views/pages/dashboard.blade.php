@@ -17,7 +17,7 @@
 
             <form method="POST" action="{{ route('dashboard.newEntry') }}">
                 @csrf <!-- CSRF token for security (cross site request forgery) -->
-                <div class="input-group rounded-pill border px-3">
+                <div class="input-group rounded-5 border px-3">
                     <div class="dropdown align-content-center">
                         <button class="p-0 border-0 bg-transparent text-reset shadow-none me-2" type="button" id="tagDropdownButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Open tags">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hash" viewBox="0 0 16 16" role="img" aria-hidden="true">
@@ -70,7 +70,7 @@
                     </div>
                     <input name="id" type="hidden" value="{{ auth()->id() }}">
                     <input name="tag" type="hidden" value="Thoughts">
-                    <input type="text" name="content" class="form-control border-0 shadow-none" placeholder="Start typing…" required>
+                    <textarea id="dashboard-input" name="content" class="form-control border-0 shadow-none auto-resize-textarea" placeholder="Start typing…" required rows="1"></textarea>
                 </div>
             </form>
 
@@ -172,7 +172,6 @@
                         <span class="arrow me-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
                               <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                            </svg>
                         </span>
                         Shopping
                     </div>
@@ -192,7 +191,6 @@
                         <span class="arrow me-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
                               <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                            </svg>
                         </span>
                         Garden
                     </div>

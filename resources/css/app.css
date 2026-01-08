@@ -193,7 +193,13 @@ form .midBtn {
 }
 
 .input-group {
-    height: 48px;
+    min-height: 48px;
+}
+
+#dashboard-input {
+    margin: 3px;
+    resize: none;
+    overflow: hidden;
 }
 
 .category-header {
