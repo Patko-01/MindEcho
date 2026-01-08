@@ -8,9 +8,7 @@
                         llama3.2:latest
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="AIModelsDropdownButton">
-                        <li><a class="dropdown-item" href="#">llama3.2:latest</a></li>
-                        <li><a class="dropdown-item" href="#">llama3.1:old</a></li>
-                        <li><a class="dropdown-item" href="#">helpingai2-9b</a></li>
+                        <li><button type="button" class="btn btn-sm js-model-toggle" aria-labelledby="AIModel llama3.2:latest">llama3.2:latest</button></li>
                     </ul>
                 </div>
             </div>
@@ -69,16 +67,17 @@
                         </ul>
                     </div>
                     <input name="id" type="hidden" value="{{ auth()->id() }}">
-                    <input name="tag" type="hidden" value="Thoughts">
+                    <input name="tag" type="hidden" value="{{ request('tag', 'Thoughts') }}">
+                    <input name="model" type="hidden" value="{{ DB::table('models')->value('name') ?? 'llama3.2:latest' }}">
                     <textarea id="dashboard-input" name="content" class="form-control border-0 shadow-none auto-resize-textarea" placeholder="Start typing…" required rows="1"></textarea>
                 </div>
             </form>
 
             @if(session('ai_title'))
-                <pre>{{ session('ai_title') }}</pre>
+                <p>{{ session('ai_title') }}</p>
             @endif
             @if(session('ai_response'))
-                <pre>{{ session('ai_response') }}</pre>
+                <p>{{ session('ai_response') }}</p>
             @endif
         </div>
 
@@ -92,10 +91,10 @@
                 </button>
             </div>
 
-            <!-- Thoughts -->
+            @foreach($data as $tag => $entries)
             <div class="mb-3">
                 <div class="category-header d-flex justify-content-between align-items-center"
-                     data-bs-toggle="collapse" data-bs-target="#thoughts"
+                     data-bs-toggle="collapse" data-bs-target="#{{ $tag }}"
                      aria-expanded="false">
                     <div class="d-flex align-items-center">
                         <span class="arrow me-2">
@@ -103,103 +102,27 @@
                               <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
                             </svg>
                         </span>
-                        Thoughts
+                        {{ $tag }}
                     </div>
-                    <span class="badge rounded-pill">2</span>
+                    <span class="badge rounded-pill">{{ count($entries) }}</span>
                 </div>
-                <div id="thoughts" class="collapse collapse-content fade-smooth mt-2">
-                    <div class="item-box mb-2 d-flex gap-3 align-items-center">
-                        <input class="form-check-input" type="checkbox" id="thought-1" aria-label="Waking up with a good mood">
-                        <div class="flex-grow-1">
-                            <button type="button" class="btn btn-link w-100 text-start p-0 text-decoration-none text-body" aria-label="Open task: Waking up with a good mood">
-                                <span class="d-block">
-                                    <span class="item-text d-block">Waking up with a good mood</span>
-                                    <span class="item-date d-block">08.11.2025 18:37</span>
-                                </span>
-                            </button>
+                <div id="{{ $tag }}" class="collapse collapse-content fade-smooth mt-2">
+                    @foreach($entries as $entry)
+                        <div class="item-box mb-2 d-flex gap-3 align-items-center">
+                            <input class="form-check-input" type="checkbox" id="check-{{ $tag }}-{{ $entry->id }}" aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
+                            <div class="flex-grow-1">
+                                <button type="button" id="{{ $tag }}-{{ $entry->id }}" class="btn btn-link w-100 text-start p-0 text-decoration-none text-body" aria-label="Open entry: {{ $entry->entry_title }}">
+                                    <span class="d-block">
+                                        <span class="item-text d-block">{{ $entry->entry_title }}</span>
+                                        <span class="item-date d-block">{{ $entry->created_at->format('d.m.Y H:i') }}</span>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-box d-flex gap-3 align-items-center mb-2">
-                        <input class="form-check-input" type="checkbox" id="thought-2" aria-label="Forgetting too quickly">
-                        <div class="flex-grow-1">
-                            <button type="button" class="btn btn-link w-100 text-start p-0 text-decoration-none text-body" aria-label="Open task: Forgetting too quickly">
-                                <span class="d-block">
-                                    <span class="item-text d-block">Forgetting too quickly</span>
-                                    <span class="item-date d-block">09.11.2025 13:02</span>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
-
-            <!-- Tasks -->
-            <div class="mb-3">
-                <div class="category-header d-flex justify-content-between align-items-center"
-                     data-bs-toggle="collapse" data-bs-target="#tasks"
-                     aria-expanded="false">
-                    <div class="d-flex align-items-center">
-                        <span class="arrow me-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                              <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                            </svg>
-                        </span>
-                        Tasks
-                    </div>
-                    <span class="badge rounded-pill">1</span>
-                </div>
-                <div id="tasks" class="collapse collapse-content fade-smooth mt-2">
-                    <div class="item-box d-flex gap-3 align-items-center mb-2">
-                        <input class="form-check-input" type="checkbox" id="task-1" aria-label="Example task">
-                        <div class="flex-grow-1">
-                            <button type="button" class="btn btn-link w-100 text-start p-0 text-decoration-none text-body" aria-label="Open task: Example task">
-                                <span class="d-block">
-                                    <span class="item-text d-block">Example task</span>
-                                    <span class="item-date d-block">10.11.2025 11:00</span>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Shopping -->
-            <div class="mb-3">
-                <div class="category-header d-flex justify-content-between align-items-center"
-                     data-bs-toggle="collapse" data-bs-target="#shopping"
-                     aria-expanded="false">
-                    <div class="d-flex align-items-center">
-                        <span class="arrow me-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                              <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </span>
-                        Shopping
-                    </div>
-                    <span class="badge rounded-pill">0</span>
-                </div>
-                <div id="shopping" class="collapse collapse-content fade-smooth mt-2">
-                    <!-- empty -->
-                </div>
-            </div>
-
-            <!-- Garden -->
-            <div class="mb-3">
-                <div class="category-header d-flex justify-content-between align-items-center"
-                     data-bs-toggle="collapse" data-bs-target="#garden"
-                     aria-expanded="false">
-                    <div class="d-flex align-items-center">
-                        <span class="arrow me-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                              <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </span>
-                        Garden
-                    </div>
-                    <span class="badge rounded-pill">0</span>
-                </div>
-                <div id="garden" class="collapse collapse-content fade-smooth mt-2">
-                    <!-- empty -->
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </x-layout>

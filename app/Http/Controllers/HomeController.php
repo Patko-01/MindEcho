@@ -18,9 +18,4 @@ class HomeController extends Controller
     {
         return view('pages.contact');
     }
-
-    public function dashboard(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-    {
-        return view('pages.dashboard');
-    }
 }

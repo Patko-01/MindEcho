@@ -10,7 +10,6 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home');
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
-    Route::get('/dashboard', 'dashboard')->middleware('auth')->name('dashboard');
 });
 
 Route::controller(ProfileController::class)->group(function () {
@@ -27,6 +26,7 @@ Route::middleware('guest')->controller(AuthController::class)->group(function ()
     Route::post('/login', 'login')->name('login');
 });
 
-Route::controller(DashboardController::class)->group(function () {
-    Route::post('/dashboard', 'newEntry')->middleware('auth')->name('dashboard.newEntry');
+Route::middleware('auth')->controller(DashboardController::class)->group(function () {
+    Route::post('/dashboard', 'newEntry')->name('dashboard.newEntry');
+    Route::get('/dashboard', 'index')->name('dashboard');
 });

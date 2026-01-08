@@ -39,11 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!tagInput) {
                 return;
             }
+            tagInput.value = btn.textContent.trim();
+        });
+    });
 
-            const tagName = btn.textContent.trim();
-            if (tagInput.value !== tagName) {
-                tagInput.value = tagName;
+    document.querySelectorAll('.js-model-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modelInput = document.querySelector('input[name="model"]');
+            if (!modelInput) {
+                return;
             }
+            modelInput.value = btn.textContent.trim();
         });
     });
 });
