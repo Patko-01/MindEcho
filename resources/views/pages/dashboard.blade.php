@@ -74,11 +74,11 @@
                 </div>
             </form>
 
-            @if(session('last_post'))
-                <div class="mt-3 alert alert-info">
-                    <strong>Last POSTed data:</strong>
-                    <pre>{{ json_encode(session('last_post'), JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE) }}</pre>
-                </div>
+            @if(session('ai_title'))
+                <pre>{{ session('ai_title') }}</pre>
+            @endif
+            @if(session('ai_response'))
+                <pre>{{ session('ai_response') }}</pre>
             @endif
         </div>
 
