@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @method static findOrFail(mixed $entry_id)
+ * @method static create(array $array)
+ */
 class Entry extends Model
 {
     protected $fillable = ['user_id', 'entry_title', 'tag', 'content'];

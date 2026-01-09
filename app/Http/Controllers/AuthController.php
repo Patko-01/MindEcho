@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function showRegister(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+    public function showRegister(): Factory|View
     {
         return view('auth.register');
     }
-    public function showLogin(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+    public function showLogin(): Factory|View
     {
         return view('auth.login');
     }

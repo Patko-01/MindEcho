@@ -3,6 +3,7 @@ import './bootstrap';
 document.addEventListener('DOMContentLoaded', () => {
     (function(){
         const textarea = document.getElementById('dashboard-input');
+        textarea.focus();
         if (!textarea) {
             return;
         }
@@ -50,6 +51,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             modelInput.value = btn.textContent.trim();
+        });
+    });
+
+    document.querySelectorAll('.submit-on-check').forEach(checkbox => {
+        checkbox.addEventListener('change', async function () {
+            if (!this.checked) {
+                return;
+            }
+            const form = this.closest('form');
+            if (!form) {
+                return;
+            }
+
+            const payload = {
+                user_id: form.querySelector('input[name="user_id"]').value,
+                entry_id: this.value
+            };
+
+            const token = getCsrfToken(form);
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const itemBox = this.closest('.item-box');
+                    if (itemBox) {
+                        itemBox.remove();
+                    }
+
+                    const section = form.closest('.mb-3');
+                    if (section) {
+                        const badge = section.querySelector('.badge.rounded-pill');
+                        if (badge) {
+                            const remainingItems = section.querySelectorAll('.item-box').length;
+                            if (remainingItems === 0) {
+                                window.location.reload();
+                            }
+                            badge.textContent = remainingItems;
+                        }
+                    }
+                } else if (res.status === 403) {
+                    alert('Unauthorized to delete this entry.');
+                    this.checked = false;
+                } else if (res.status === 422) {
+                    console.error('Validation failed');
+                    this.checked = false;
+                } else {
+                    this.checked = false;
+                }
+            } catch (err) {
+                console.error('Delete request failed', err);
+                this.checked = false;
+            }
         });
     });
 });

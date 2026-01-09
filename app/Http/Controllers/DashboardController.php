@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Response as HttpResponse;
 
 class DashboardController extends Controller
 {
@@ -27,7 +28,7 @@ class DashboardController extends Controller
         $data = $request->validate([
             'content' => 'required|string',
             'tag' => 'required|string',
-            'model' => 'nullable|string',
+            'model' => 'nullable|string|exists:models,name',
         ]);
 
         $tag = $data['tag'];
@@ -68,5 +69,24 @@ class DashboardController extends Controller
         session()->flash('ai_title', $title);
         session()->flash('ai_response', $question);
         return redirect()->route('dashboard', ['tag' => $tag]);
+    }
+
+    public function destroy(Request $request): HttpResponse
+    {
+        $data = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+            'entry_id' => 'required|integer|exists:entries,id',
+        ]);
+
+        $entry = Entry::findOrFail($data['entry_id']);
+
+        if ($entry->user_id !== $request->user()->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $entry->response()->delete();
+        $entry->delete();
+
+        return response()->noContent();
     }
 }

@@ -95,7 +95,7 @@
             <div class="mb-3">
                 <div class="category-header d-flex justify-content-between align-items-center"
                      data-bs-toggle="collapse" data-bs-target="#{{ $tag }}"
-                     aria-expanded="false">
+                     aria-expanded="{{ request('tag') === $tag ? 'true' : 'false' }}">
                     <div class="d-flex align-items-center">
                         <span class="arrow me-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
@@ -106,19 +106,24 @@
                     </div>
                     <span class="badge rounded-pill">{{ count($entries) }}</span>
                 </div>
-                <div id="{{ $tag }}" class="collapse collapse-content fade-smooth mt-2">
+                <div id="{{ $tag }}" class="collapse collapse-content fade-smooth mt-2 {{ request('tag') === $tag ? 'show' : '' }}">
                     @foreach($entries as $entry)
-                        <div class="item-box mb-2 d-flex gap-3 align-items-center">
-                            <input class="form-check-input" type="checkbox" id="check-{{ $tag }}-{{ $entry->id }}" aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
-                            <div class="flex-grow-1">
-                                <button type="button" id="{{ $tag }}-{{ $entry->id }}" class="btn btn-link w-100 text-start p-0 text-decoration-none text-body" aria-label="Open entry: {{ $entry->entry_title }}">
-                                    <span class="d-block">
-                                        <span class="item-text d-block">{{ $entry->entry_title }}</span>
-                                        <span class="item-date d-block">{{ $entry->created_at->format('d.m.Y H:i') }}</span>
-                                    </span>
-                                </button>
+                        <form method="POST" action="{{ route('dashboard.destroy') }}">
+                            @csrf
+                            @method('DELETE')
+                            <div class="item-box mb-2 d-flex gap-3 align-items-center">
+                                <input name="user_id" type="hidden" value="{{ auth()->id() }}">
+                                <input name="entry_id" value="{{ $entry->id }}" class="form-check-input submit-on-check" type="checkbox" aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
+                                <div class="flex-grow-1">
+                                    <button type="button" class="btn btn-link w-100 text-start p-0 text-decoration-none text-body" aria-label="Open entry: {{ $entry->entry_title }}">
+                                        <span class="d-block">
+                                            <span class="item-text d-block">{{ $entry->entry_title }}</span>
+                                            <span class="item-date d-block">{{ $entry->created_at->format('d.m.Y H:i') }}</span>
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     @endforeach
                 </div>
             </div>

@@ -12,10 +12,10 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/contact', 'contact')->name('contact');
 });
 
-Route::controller(ProfileController::class)->group(function () {
-    Route::get('/profile', 'index')->middleware('auth')->name('show.profile.edit');
-    Route::post('/profile', 'update')->middleware('auth')->name('profile.update');
-    Route::delete('/profile', 'destroy')->middleware('auth')->name('profile.destroy');
+Route::middleware('auth')->controller(ProfileController::class)->group(function () {
+    Route::get('/profile', 'index')->name('show.profile.edit');
+    Route::post('/profile', 'update')->name('profile.update');
+    Route::delete('/profile', 'destroy')->name('profile.destroy');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -28,5 +28,6 @@ Route::middleware('guest')->controller(AuthController::class)->group(function ()
 
 Route::middleware('auth')->controller(DashboardController::class)->group(function () {
     Route::post('/dashboard', 'newEntry')->name('dashboard.newEntry');
+    Route::delete('/dashboard', 'destroy')->name('dashboard.destroy');
     Route::get('/dashboard', 'index')->name('dashboard');
 });

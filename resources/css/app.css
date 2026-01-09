@@ -263,3 +263,8 @@ form .midBtn {
     max-width: 32rem;
     margin-bottom: 2.5rem;
 }
+
+.submit-on-check {
+    cursor: pointer;
+}
+
