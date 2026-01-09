@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @method static findOrFail(mixed $entry_id)
  * @method static create(array $array)
+ * @method static where(string $string, mixed $entry_id)
  */
 class Entry extends Model
 {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\Models;
 use App\Models\Response;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -16,11 +17,17 @@ class DashboardController extends Controller
     public function index(Request $request): Factory|View
     {
         $user = $request->user();
-        $entries = Entry::query()->where('user_id', $user->id)->latest()->get();
 
+        $entries = Entry::query()->where('user_id', $user->id)->latest()->get();
         $data = $entries->groupBy('tag');
 
-        return view('pages.dashboard', [ 'data' => $data ]);
+        $models = Models::pluck('name');
+
+        $usedModel = $request->filled('model') && $models->contains($request->model)
+            ? $request->model
+            : ($models->first() ?? 'llama3.2:latest');
+
+        return view('pages.dashboard', compact('data', 'models', 'usedModel'));
     }
 
     public function newEntry(Request $request): RedirectResponse
@@ -41,8 +48,8 @@ class DashboardController extends Controller
         $model = $data['model'] ?? 'llama3.2:latest';
 
         $ollamaTitleResponse = Http::post('http://localhost:11434/api/generate', [
-            'model' => $model,
-            'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry.',
+            'model' => 'llama3.2:latest', // Use a consistent model for title generation
+            'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
             'prompt' => $data['content'],
             'stream' => false,
         ]);
@@ -54,7 +61,7 @@ class DashboardController extends Controller
 
         $ollamaResponse = Http::post('http://localhost:11434/api/generate', [
             'model' => $model,
-            'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to ask one thoughtful, open-ended question that helps the user reflect deeper on their emotions, values, needs, or motivations. No advice. No explanation. Only the question.',
+            'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to ask one thoughtful, open-ended question that helps the user reflect deeper on their emotions, values, needs, or motivations. No advices. No explanations. Only the question, no extra words.',
             'prompt' => $data['content'],
             'stream' => false,
         ]);
@@ -68,21 +75,16 @@ class DashboardController extends Controller
 
         session()->flash('ai_title', $title);
         session()->flash('ai_response', $question);
-        return redirect()->route('dashboard', ['tag' => $tag]);
+        return redirect()->route('dashboard', ['tag' => $tag, 'model' => $model]);
     }
 
     public function destroy(Request $request): HttpResponse
     {
         $data = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
             'entry_id' => 'required|integer|exists:entries,id',
         ]);
 
-        $entry = Entry::findOrFail($data['entry_id']);
-
-        if ($entry->user_id !== $request->user()->id) {
-            abort(403, 'Unauthorized action.');
-        }
+        $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
 
         $entry->response()->delete();
         $entry->delete();

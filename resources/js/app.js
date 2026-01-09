@@ -2,17 +2,43 @@ import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
     (function(){
+        const tagButton = document.getElementById('tagButton');
+        const hiddenInput = document.getElementById('selectedTagInput');
         const textarea = document.getElementById('dashboard-input');
-        textarea.focus();
         if (!textarea) {
             return;
         }
+        textarea.focus();
 
         function resize() {
             textarea.style.height = 'auto';
             const taHeight = textarea.scrollHeight;
             textarea.style.height = taHeight + 'px';
         }
+
+        function saveTag() {
+            const val = hiddenInput.value.trim() || 'Thoughts';
+            tagButton.textContent = '#' + val;
+            hiddenInput.type = 'hidden';
+            tagButton.style.display = 'inline-block';
+            textarea.focus();
+        }
+
+        tagButton.addEventListener('click', () => {
+            hiddenInput.value = tagButton.textContent.trim().slice(1);
+            tagButton.style.display = 'none';
+            hiddenInput.type = 'text';
+            hiddenInput.focus();
+            hiddenInput.setSelectionRange(hiddenInput.value.length, hiddenInput.value.length);
+        });
+
+        hiddenInput.addEventListener('blur', saveTag);
+        hiddenInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveTag();
+            }
+        });
 
         resize();
         textarea.addEventListener('input', resize);
@@ -46,10 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.js-model-toggle').forEach(btn => {
         btn.addEventListener('click', () => {
+            const displayModel = document.getElementById('displayed-model');
             const modelInput = document.querySelector('input[name="model"]');
+            if (!displayModel) {
+                return;
+            }
             if (!modelInput) {
                 return;
             }
+            displayModel.textContent = btn.textContent.trim();
             modelInput.value = btn.textContent.trim();
         });
     });
@@ -65,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const payload = {
-                user_id: form.querySelector('input[name="user_id"]').value,
                 entry_id: this.value
             };
 
@@ -100,9 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             badge.textContent = remainingItems;
                         }
                     }
-                } else if (res.status === 403) {
-                    alert('Unauthorized to delete this entry.');
-                    this.checked = false;
                 } else if (res.status === 422) {
                     console.error('Validation failed');
                     this.checked = false;

@@ -1,5 +1,13 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
+.icon-btn {
+    border: none;
+}
+
+.btn:focus-visible {
+    outline: 1px solid currentColor;
+}
+
 .navbar .container-fluid {
     padding-left: 3rem;
     padding-right: 3rem;
@@ -267,4 +275,3 @@ form .midBtn {
 .submit-on-check {
     cursor: pointer;
 }
-
