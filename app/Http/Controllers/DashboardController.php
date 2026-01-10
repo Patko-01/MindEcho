@@ -23,8 +23,9 @@ class DashboardController extends Controller
 
         $models = Models::pluck('name');
 
-        $usedModel = $request->filled('model') && $models->contains($request->model)
-            ? $request->model
+        $sessionModel = session('model');
+        $usedModel = $sessionModel && $models->contains($sessionModel)
+            ? $sessionModel
             : ($models->first() ?? 'llama3.2:latest');
 
         return view('pages.dashboard', compact('data', 'models', 'usedModel'));
@@ -39,13 +40,15 @@ class DashboardController extends Controller
         ]);
 
         $tag = $data['tag'];
+        $model = $data['model'] ?? 'llama3.2:latest';
 
         if ($data['tag'] != "Thoughts") {
-            Entry::create(['user_id' => $request->user()->id, 'entry_title' => $data['content'], 'tag' => $data['tag'], 'content' => $data['content']]);
-            return redirect()->route('dashboard', ['tag' => $tag]);
+            $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $data['content'], 'tag' => $data['tag'], 'content' => $data['content']]);
+            return redirect()->route('dashboard')
+                ->with('tag', $tag)
+                ->with('model', $model)
+                ->with('entry', $entry->only(['id', 'entry_title', 'content']));
         }
-
-        $model = $data['model'] ?? 'llama3.2:latest';
 
         $ollamaTitleResponse = Http::post('http://localhost:11434/api/generate', [
             'model' => 'llama3.2:latest', // Use a consistent model for title generation
@@ -70,12 +73,21 @@ class DashboardController extends Controller
             $question = 'What feels most important about this moment?';
         }
 
-        $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $data['tag'], 'content' => $data['content']]);
+        $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $tag, 'content' => $data['content']]);
         Response::create(['entry_id' => $entry->id, 'content' => $question]);
 
-        session()->flash('ai_title', $title);
-        session()->flash('ai_response', $question);
-        return redirect()->route('dashboard', ['tag' => $tag, 'model' => $model]);
+        $payload = [
+            'id' => $entry->id,
+            'entry_title' => $title,
+            'content' => $data['content'],
+            'aiQuestion' => $question,
+            'created_at' => $entry->created_at,
+        ];
+
+        return redirect()->route('dashboard')
+            ->with('tag', $tag)
+            ->with('model', $model)
+            ->with('entry', $payload);
     }
 
     public function destroy(Request $request): HttpResponse

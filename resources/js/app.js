@@ -87,11 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.submit-on-check').forEach(checkbox => {
         checkbox.addEventListener('change', async function () {
-            if (!this.checked) {
-                return;
-            }
-            const form = this.closest('form');
-            if (!form) {
+            const closestForm = this.closest('form');
+            if (!closestForm) {
                 return;
             }
 
@@ -99,10 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 entry_id: this.value
             };
 
-            const token = getCsrfToken(form);
+            const token = getCsrfToken(closestForm);
 
             try {
-                const res = await fetch(form.action, {
+                const res = await fetch(closestForm.action, {
                     method: 'DELETE',
                     headers: {
                         'Accept': 'application/json',
@@ -114,31 +111,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (res.ok) {
-                    const itemBox = this.closest('.item-box');
-                    if (itemBox) {
-                        itemBox.remove();
+                    const removableForm = document.getElementById("removableForm");
+                    let section = closestForm.closest('.tag');
+
+                    if (removableForm) {
+                        const entryId = closestForm.querySelector('input[name="entry_id"]').value;
+                        if (removableForm === closestForm) { // remove the display message only if the checkbox inside display message was clicked
+                            removableForm.remove();
+
+                            const forms = document.querySelectorAll('.tag-Thoughts');
+                            let targetForm = null;
+
+                            forms.forEach(form => {
+                                const input = form.querySelector('input[name="entry_id"]');
+                                if (input) {
+                                    if (input.value === entryId) {
+                                        targetForm = form;
+                                    }
+                                }
+                            });
+
+                            if (targetForm) {
+                                section = targetForm.closest('.tag');
+                                targetForm.remove();
+                            }
+                        } else {
+                            if (entryId && removableForm.querySelector('input[name="entry_id"]').value === entryId) {
+                                removableForm.remove();
+                            }
+                        }
                     }
 
-                    const section = form.closest('.mb-3');
+                    if (closestForm) {
+                        closestForm.remove();
+                    }
                     if (section) {
                         const badge = section.querySelector('.badge.rounded-pill');
                         if (badge) {
                             const remainingItems = section.querySelectorAll('.item-box').length;
                             if (remainingItems === 0) {
-                                window.location.reload();
+                                section.remove();
                             }
                             badge.textContent = remainingItems;
                         }
                     }
                 } else if (res.status === 422) {
                     console.error('Validation failed');
-                    this.checked = false;
-                } else {
-                    this.checked = false;
                 }
             } catch (err) {
                 console.error('Delete request failed', err);
-                this.checked = false;
             }
         });
     });
