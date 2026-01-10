@@ -5,9 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tagButton = document.getElementById('tagButton');
         const hiddenInput = document.getElementById('selectedTagInput');
         const textarea = document.getElementById('dashboard-input');
-        if (!textarea) {
-            return;
-        }
+
         textarea.focus();
 
         function resize() {
@@ -42,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resize();
         textarea.addEventListener('input', resize);
+        window.addEventListener('resize', resize);
+
         textarea.addEventListener('keydown', function(e){
             // Ignore if user is composing IME input
             if (e.isComposing) {
@@ -55,114 +55,114 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 form.submit();
+                textarea.disabled = true;
             }
         });
-        window.addEventListener('resize', resize);
-    })();
 
-    document.querySelectorAll('.js-tag-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tagInput = document.querySelector('input[name="tag"]');
-            if (!tagInput) {
-                return;
-            }
-            tagInput.value = btn.textContent.trim();
-        });
-    });
-
-    document.querySelectorAll('.js-model-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const displayModel = document.getElementById('displayed-model');
-            const modelInput = document.querySelector('input[name="model"]');
-            if (!displayModel) {
-                return;
-            }
-            if (!modelInput) {
-                return;
-            }
-            displayModel.textContent = btn.textContent.trim();
-            modelInput.value = btn.textContent.trim();
-        });
-    });
-
-    document.querySelectorAll('.submit-on-check').forEach(checkbox => {
-        checkbox.addEventListener('change', async function () {
-            const closestForm = this.closest('form');
-            if (!closestForm) {
-                return;
-            }
-
-            const payload = {
-                entry_id: this.value
-            };
-
-            const token = getCsrfToken(closestForm);
-
-            try {
-                const res = await fetch(closestForm.action, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (res.ok) {
-                    const removableForm = document.getElementById("removableForm");
-                    let section = closestForm.closest('.tag');
-
-                    if (removableForm) {
-                        const entryId = closestForm.querySelector('input[name="entry_id"]').value;
-                        if (removableForm === closestForm) { // remove the display message only if the checkbox inside display message was clicked
-                            removableForm.remove();
-
-                            const forms = document.querySelectorAll('.tag-Thoughts');
-                            let targetForm = null;
-
-                            forms.forEach(form => {
-                                const input = form.querySelector('input[name="entry_id"]');
-                                if (input) {
-                                    if (input.value === entryId) {
-                                        targetForm = form;
-                                    }
-                                }
-                            });
-
-                            if (targetForm) {
-                                section = targetForm.closest('.tag');
-                                targetForm.remove();
-                            }
-                        } else {
-                            if (entryId && removableForm.querySelector('input[name="entry_id"]').value === entryId) {
-                                removableForm.remove();
-                            }
-                        }
-                    }
-
-                    if (closestForm) {
-                        closestForm.remove();
-                    }
-                    if (section) {
-                        const badge = section.querySelector('.badge.rounded-pill');
-                        if (badge) {
-                            const remainingItems = section.querySelectorAll('.item-box').length;
-                            if (remainingItems === 0) {
-                                section.remove();
-                            }
-                            badge.textContent = remainingItems;
-                        }
-                    }
-                } else if (res.status === 422) {
-                    console.error('Validation failed');
+        document.querySelectorAll('.js-tag-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tagInput = document.querySelector('input[name="tag"]');
+                if (!tagInput) {
+                    return;
                 }
-            } catch (err) {
-                console.error('Delete request failed', err);
-            }
+                tagInput.value = btn.textContent.trim();
+            });
         });
-    });
+
+        document.querySelectorAll('.js-model-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const displayModel = document.getElementById('displayed-model');
+                const modelInput = document.querySelector('input[name="model"]');
+                if (!displayModel) {
+                    return;
+                }
+                if (!modelInput) {
+                    return;
+                }
+                displayModel.textContent = btn.textContent.trim();
+                modelInput.value = btn.textContent.trim();
+            });
+        });
+
+        document.querySelectorAll('.submit-on-check').forEach(checkbox => {
+            checkbox.addEventListener('change', async function () {
+                const closestForm = this.closest('form');
+                if (!closestForm) {
+                    return;
+                }
+
+                const payload = {
+                    entry_id: this.value
+                };
+
+                const token = getCsrfToken(closestForm);
+
+                try {
+                    const res = await fetch(closestForm.action, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        const removableForm = document.getElementById("removableForm");
+                        let section = closestForm.closest('.tag');
+
+                        if (removableForm) {
+                            const entryId = closestForm.querySelector('input[name="entry_id"]').value;
+                            if (removableForm === closestForm) { // remove the display message only if the checkbox inside display message was clicked
+                                removableForm.remove();
+
+                                const forms = document.querySelectorAll('.tag-Thoughts');
+                                let targetForm = null;
+
+                                forms.forEach(form => {
+                                    const input = form.querySelector('input[name="entry_id"]');
+                                    if (input) {
+                                        if (input.value === entryId) {
+                                            targetForm = form;
+                                        }
+                                    }
+                                });
+
+                                if (targetForm) {
+                                    section = targetForm.closest('.tag');
+                                    targetForm.remove();
+                                }
+                            } else {
+                                if (entryId && removableForm.querySelector('input[name="entry_id"]').value === entryId) {
+                                    removableForm.remove();
+                                }
+                            }
+                        }
+
+                        if (closestForm) {
+                            closestForm.remove();
+                        }
+                        if (section) {
+                            const badge = section.querySelector('.badge.rounded-pill');
+                            if (badge) {
+                                const remainingItems = section.querySelectorAll('.item-box').length;
+                                if (remainingItems === 0) {
+                                    section.remove();
+                                }
+                                badge.textContent = remainingItems;
+                            }
+                        }
+                    } else if (res.status === 422) {
+                        console.error('Validation failed');
+                    }
+                } catch (err) {
+                    console.error('Delete request failed', err);
+                }
+            });
+        });
+    })();
 });
 
 function getCsrfToken(form) {
