@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const hiddenInput = document.getElementById('selectedTagInput');
         const textarea = document.getElementById('dashboard-input');
 
+        if (!tagButton || !hiddenInput || !textarea) {
+            return;
+        }
+
         textarea.focus();
 
         function resize() {

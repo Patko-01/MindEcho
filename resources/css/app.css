@@ -196,10 +196,6 @@ form .midBtn {
     margin-top: auto !important; /* push icon to the bottom of the column */
 }
 
-.dashboard-container-part {
-    width: 45%;
-}
-
 .input-group {
     min-height: 48px;
 }

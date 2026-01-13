@@ -40,14 +40,14 @@ class DashboardController extends Controller
         ]);
 
         $tag = $data['tag'];
-        $model = $data['model'] ?? 'llama3.2:latest';
+        $model = $data['model'];
 
         if ($data['tag'] != "Thoughts") {
             $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $data['content'], 'tag' => $data['tag'], 'content' => $data['content']]);
             return redirect()->route('dashboard')
                 ->with('tag', $tag)
                 ->with('model', $model)
-                ->with('entry', $entry->only(['id', 'entry_title', 'content']));
+                ->with('entry', $entry->only(['id', 'entry_title', 'content', 'tag']));
         }
 
         $ollamaTitleResponse = Http::post('http://localhost:11434/api/generate', [
@@ -73,8 +73,10 @@ class DashboardController extends Controller
             $question = 'What feels most important about this moment?';
         }
 
+        $modelId = Models::where('name', $model)->first()->id;
+
         $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $tag, 'content' => $data['content']]);
-        Response::create(['entry_id' => $entry->id, 'content' => $question]);
+        Response::create(['entry_id' => $entry->id, 'models_id' => $modelId,'content' => $question]);
 
         $payload = [
             'id' => $entry->id,
@@ -82,11 +84,37 @@ class DashboardController extends Controller
             'content' => $data['content'],
             'aiQuestion' => $question,
             'created_at' => $entry->created_at,
+            'tag' => 'Thoughts',
+            'model' => $model,
         ];
 
         return redirect()->route('dashboard')
             ->with('tag', $tag)
             ->with('model', $model)
+            ->with('entry', $payload);
+    }
+
+    public function showEntry(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'entry_id' => 'required|integer|exists:entries,id',
+        ]);
+
+        $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
+        $response = Response::where('entry_id', $entry->id)->firstOrFail();
+
+        $payload = [
+            'id' => $entry->id,
+            'entry_title' => $entry->entry_title,
+            'content' => $entry->content,
+            'aiQuestion' => $response->content,
+            'created_at' => $entry->created_at,
+            'tag' => $entry->tag,
+            'model' => $response->models->name,
+        ];
+
+        return redirect()->route('dashboard')
+            ->with('tag', session('tag', $entry->tag))
             ->with('entry', $payload);
     }
 

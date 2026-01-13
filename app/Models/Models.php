@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static pluck(string $string)
+ * @method static where(string $string, mixed $model)
  */
 class Models extends Model
 {
@@ -15,5 +16,10 @@ class Models extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function responses(): HasMany
+    {
+        return $this->hasMany(Response::class);
     }
 }

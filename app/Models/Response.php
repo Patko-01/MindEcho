@@ -7,13 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @method static create(array $array)
+ * @method static where(string $string, $id)
  */
 class Response extends Model
 {
-    protected $fillable = ['entry_id', 'content'];
+    protected $fillable = ['entry_id', 'models_id', 'content'];
 
     public function entries(): BelongsTo
     {
         return $this->belongsTo(Entry::class);
+    }
+
+    public function models(): BelongsTo
+    {
+        return $this->belongsTo(Models::class);
     }
 }
