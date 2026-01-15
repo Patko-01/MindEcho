@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @method static pluck(string $string)
  * @method static where(string $string, mixed $model)
+ * @method static create(array $array)
  */
 class Models extends Model
 {

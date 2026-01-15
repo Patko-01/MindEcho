@@ -47,6 +47,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
                     </li>
+                    @can('access-admin')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin') }}">Admin</a>
+                        </li>
+                    @endcan
                     <li class="nav-item">
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf

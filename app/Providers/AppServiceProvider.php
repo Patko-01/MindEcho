@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +28,10 @@ class AppServiceProvider extends ServiceProvider
             // Fallback to the generic useBootstrap if the specific method is unavailable
             Paginator::useBootstrap();
         }
+
+        // Gate to restrict admin access to user with id === 1
+        Gate::define('access-admin', function ($user) {
+            return $user && (int) $user->id === 1;
+        });
     }
 }

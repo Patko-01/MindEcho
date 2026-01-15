@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -31,4 +32,9 @@ Route::middleware('auth')->controller(DashboardController::class)->group(functio
     Route::delete('/dashboard', 'destroy')->name('dashboard.destroy');
     Route::get('/dashboard', 'index')->name('dashboard');
     Route::get('/dashboard/entry', 'showEntry')->name('dashboard.showEntry');
+});
+
+Route::middleware(['auth', 'can:access-admin'])->controller(AdminController::class)->group(function () {
+    Route::get('/admin', 'index')->name('admin');
+    Route::post('/admin', 'addModel')->name('admin.addModel');
 });
