@@ -6,12 +6,12 @@
 
             <div class="mb-3 mt-4">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" value="{{ old('name', auth()->user()?->name) }}" name="name" class="form-control" id="name" aria-describedby="personNameHelp" required>
+                <input type="text" value="{{ old('name', auth()->getUser()->name) }}" name="name" class="form-control" id="name" aria-describedby="personNameHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="name"></div>
             </div>
             <div class="mb-3">
                 <label for="loginPersonEmail1" class="form-label">Email</label>
-                <input type="email" value="{{ old('email', auth()->user()?->email) }}" name="email" class="form-control" id="loginPersonEmail1" aria-describedby="personEmailHelp" disabled>
+                <input type="email" value="{{ old('email', auth()->getUser()->email) }}" name="email" class="form-control" id="loginPersonEmail1" aria-describedby="personEmailHelp" disabled>
             </div>
             <div class="mb-3">
                 <label for="loginPersonPassword1" class="form-label">New password (optional)</label>

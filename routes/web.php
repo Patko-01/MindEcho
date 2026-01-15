@@ -38,3 +38,5 @@ Route::middleware(['auth', 'can:access-admin'])->controller(AdminController::cla
     Route::get('/admin', 'index')->name('admin');
     Route::post('/admin', 'addModel')->name('admin.addModel');
 });
+
+

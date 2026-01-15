@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+    public function index(): Factory|View
     {
         return view('profile.edit');
     }
-    public function update(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function update(Request $request): Redirector|RedirectResponse
     {
         $user = $request->user();
 
@@ -33,7 +37,7 @@ class ProfileController extends Controller
 
         return redirect()->route('home')->with('status', 'Profile updated successfully.');
     }
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function destroy(Request $request): Redirector|RedirectResponse
     {
         $user = $request->user();
 

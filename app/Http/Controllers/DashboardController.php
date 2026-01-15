@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Http\Client\ConnectionException;
 
 class DashboardController extends Controller
 {
@@ -50,30 +51,48 @@ class DashboardController extends Controller
                 ->with('entry', $entry->only(['id', 'entry_title', 'content', 'tag']));
         }
 
-        $ollamaTitleResponse = Http::post('http://localhost:11434/api/generate', [
-            'model' => 'llama3.2:latest', // Use a consistent model for title generation
-            'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
-            'prompt' => $data['content'],
-            'stream' => false,
-        ]);
-        $title = trim($ollamaTitleResponse->json('response'));
-        if (empty($title)) {
-            $title = 'Untitled Entry';
-        }
-        $title = trim($title, "\" \n\t.");
-
-        $ollamaResponse = Http::post('http://localhost:11434/api/generate', [
-            'model' => $model,
-            'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to ask one thoughtful, open-ended question that helps the user reflect deeper on their emotions, values, needs, or motivations. No advices. No explanations. Only the question, no extra words.',
-            'prompt' => $data['content'],
-            'stream' => false,
-        ]);
-        $question = trim($ollamaResponse->json('response'));
-        if (empty($question)) {
-            $question = 'What feels most important about this moment?';
+        $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
+        $title = 'Untitled Entry';
+        try {
+            $ollamaTitleResponse = Http::post($ollamaHost . '/api/generate', [
+                'model' => 'llama3.2:latest',
+                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
+                'prompt' => $data['content'],
+                'stream' => false,
+            ]);
+            $titleRaw = $ollamaTitleResponse->json('response');
+            $maybeTitle = is_string($titleRaw) ? trim($titleRaw) : '';
+            if (!empty($maybeTitle)) {
+                $title = trim($maybeTitle, "\" \n\t.");
+            }
+        } catch (ConnectionException $e) {
+            return redirect()->route('dashboard')
+                ->with('tag', $tag)
+                ->with('model', $model)
+                ->with('error', $e->getMessage());
         }
 
-        $modelId = Models::where('name', $model)->first()->id;
+        $question = 'What feels most important about this moment?';
+        try {
+            $ollamaResponse = Http::post($ollamaHost . '/api/generate', [
+                'model' => $model,
+                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to ask one thoughtful, open-ended question that helps the user reflect deeper on their emotions, values, needs, or motivations. No advices. No explanations. Only the question, no extra words.',
+                'prompt' => $data['content'],
+                'stream' => false,
+            ]);
+            $questionRaw = $ollamaResponse->json('response');
+            $maybeQuestion = is_string($questionRaw) ? trim($questionRaw) : '';
+            if (!empty($maybeQuestion)) {
+                $question = $maybeQuestion;
+            }
+        } catch (ConnectionException $e) {
+            return redirect()->route('dashboard')
+                ->with('tag', $tag)
+                ->with('model', $model)
+                ->with('error', $e->getMessage());
+        }
+
+        $modelId = Models::where('name', $model)->value('id');
 
         $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $tag, 'content' => $data['content']]);
         Response::create(['entry_id' => $entry->id, 'models_id' => $modelId,'content' => $question]);

@@ -19,7 +19,7 @@
 
             <div class="mb-3">
                 <label for="loginPersonEmail2" class="form-label">Email</label>
-                <input type="email" placeholder="Email" value="{{ old('email', auth()->user()?->email) }}" name="email" class="form-control" id="loginPersonEmail2" aria-describedby="personEmailHelp" required>
+                <input type="email" placeholder="Email" value="{{ old('email', auth()->getUser()->email) }}" name="email" class="form-control" id="loginPersonEmail2" aria-describedby="personEmailHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="email"></div>
             </div>
             <div class="mb-3">
