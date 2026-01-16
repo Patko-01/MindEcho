@@ -103,13 +103,12 @@
                         </div>
                         <span class="badge rounded-pill">{{ count($entries) }}</span>
                     </div>
-                    <div id="{{ $tag }}"
-                         class="collapse collapse-content fade-smooth mt-2 {{ session('tag') === $tag ? 'show' : '' }}">
+                    <div id="{{ $tag }}" class="collapse collapse-content fade-smooth mt-2 {{ session('tag') == $tag ? 'show' : '' }}">
                         @foreach($entries as $entry)
                             <form method="POST" class="tag-{{ $tag }}" action="{{ route('dashboard.destroy') }}">
                                 @csrf
                                 @method('DELETE')
-                                <div class="item-box mb-2 d-flex gap-3 align-items-center">
+                                <div class="item-box mb-2 d-flex gap-3 align-items-center {{ session('tag') == "Thoughts" && optional(session('entry'))['id'] == $entry->id ? "border-primary-subtle" : "" }}">
                                     <input name="entry_id" value="{{ $entry->id }}"
                                            class="form-check-input mt-0 submit-on-check" type="checkbox"
                                            aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
