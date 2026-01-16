@@ -24,10 +24,13 @@
             @endif
         </form>
 
-        <h2 class="mt-5 mb-4">Models</h2>
+        <div class="mt-5 mb-4 d-flex justify-content-between align-items-center">
+            <h2>Models</h2>
+            <input id="modelSearch" class="form-control w-50" type="search" placeholder="Search model" aria-label="SearchModel"/>
+        </div>
         <ul class="list-group">
             @foreach($models as $model)
-                <li class="list-group-item p-3 d-flex justify-content-between align-items-center">
+                <li class="list-group-item p-3 border-1 d-flex justify-content-between align-items-center">
                     <div>
                         <span class="item-text">{{ $model->name }}</span><br>
                         <small class="text-muted">{{ $model->description }}</small>
