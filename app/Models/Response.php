@@ -11,15 +11,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Response extends Model
 {
-    protected $fillable = ['entry_id', 'models_id', 'content'];
+    protected $fillable = ['entry_id', 'model_name', 'content'];
 
     public function entries(): BelongsTo
     {
         return $this->belongsTo(Entry::class);
-    }
-
-    public function models(): BelongsTo
-    {
-        return $this->belongsTo(Models::class);
     }
 }

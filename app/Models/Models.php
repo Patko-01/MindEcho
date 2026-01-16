@@ -15,9 +15,4 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Models extends Model
 {
     protected $fillable = ['name', 'description'];
-
-    public function responses(): HasMany
-    {
-        return $this->hasMany(Response::class);
-    }
 }

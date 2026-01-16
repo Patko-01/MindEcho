@@ -92,10 +92,8 @@ class DashboardController extends Controller
                 ->with('error', $e->getMessage());
         }
 
-        $modelId = Models::where('name', $model)->value('id');
-
         $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $tag, 'content' => $data['content']]);
-        Response::create(['entry_id' => $entry->id, 'models_id' => $modelId,'content' => $question]);
+        Response::create(['entry_id' => $entry->id, 'model_name' => $model,'content' => $question]);
 
         $payload = [
             'id' => $entry->id,
@@ -129,7 +127,7 @@ class DashboardController extends Controller
             'aiQuestion' => $response->content,
             'created_at' => $entry->created_at,
             'tag' => $entry->tag,
-            'model' => $response->models->name,
+            'model' => $response->model_name,
         ];
 
         return redirect()->route('dashboard')
