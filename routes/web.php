@@ -37,6 +37,7 @@ Route::middleware('auth')->controller(DashboardController::class)->group(functio
 Route::middleware(['auth', 'can:access-admin'])->controller(AdminController::class)->group(function () {
     Route::get('/admin', 'index')->name('admin');
     Route::post('/admin', 'addModel')->name('admin.addModel');
+    Route::delete('/admin', 'destroy')->name('admin.destroy');
 });
 
 

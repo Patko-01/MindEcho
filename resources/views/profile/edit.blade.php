@@ -29,7 +29,7 @@
         </div>
 
         <div class="text-center">
-            <form action="{{ route('profile.destroy') }}" method="POST" class="d-inline">
+            <form id="profile-delete-form" action="{{ route('profile.destroy') }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-link p-0 m-0 align-baseline link-primary">Delete account</button>

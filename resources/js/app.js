@@ -468,6 +468,25 @@ if (profileForm) {
     });
 }
 
+const deleteAccountForm = document.getElementById('profile-delete-form');
+if (deleteAccountForm) {
+    deleteAccountForm.addEventListener('submit', function(e) {
+        const confirmation = confirm('Are you sure you want to delete your account? This action cannot be undone.');
+        if (!confirmation) {
+            e.preventDefault();
+        }
+    });
+}
+
+document.querySelectorAll(".model-delete-form").forEach(form => {
+   form.addEventListener('submit', function (e) {
+       const confirmation = confirm('Are you sure you want to delete this model? This action cannot be undone.');
+       if (!confirmation) {
+           e.preventDefault();
+       }
+   });
+});
+
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
     const EMAILJS_SERVICE_ID = 'service_bl4y65j';

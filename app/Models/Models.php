@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static where(string $string, mixed $model)
  * @method static create(array $array)
  * @method static firstOrCreate(string[] $array, string[] $array1)
+ * @method static findOrFail(mixed $modelId)
  */
 class Models extends Model
 {
