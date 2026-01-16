@@ -57,3 +57,89 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# MindEcho: Run Guide (Windows)
+
+This project is a Laravel + Vite application. Below are the exact steps to get it running locally on Windows using PowerShell.
+
+## Prerequisites
+- PHP 8.2+ and Composer installed
+- Node.js 18+ and npm
+- Herd (for serving the PHP app) turned on
+- Ollama installed and available in your PATH
+- SQLite is bundled (see `database/database.sqlite`)
+- Bootstrap is already included via Vite (no manual setup needed)
+
+## 1) Install dependencies
+Run these commands in the project root (`C:\Users\patri\Herd\mindecho`).
+
+```powershell
+composer install
+npm install
+```
+
+## 2) Environment setup
+If you don't have an `.env` yet, create it from the example and generate an app key.
+
+```powershell
+if (!(Test-Path .env) -and (Test-Path .env.example)) { Copy-Item .env.example .env }
+php artisan key:generate
+```
+
+Ensure your `.env` database settings match SQLite:
+- `DB_CONNECTION=sqlite`
+- `DB_DATABASE="database/database.sqlite"`
+
+## 3) Run database migrations
+```powershell
+php artisan migrate
+```
+
+## 4) Start the queue worker
+Keep a queue worker running in a separate terminal.
+
+```powershell
+php artisan queue:work
+```
+
+## 5) Start Ollama
+Start the local model server (separate terminal). If Ollama isn't already running:
+
+```powershell
+ollama serve
+```
+
+## 6) Start the frontend dev server (Vite)
+In another terminal, start Vite for hot-reload assets.
+
+```powershell
+npm run dev
+```
+
+## 7) Serve the PHP application (via Herd)
+Turn on Herd. It will auto-detect and serve the app (no need to run `php artisan serve`).
+
+Then visit your Herd site URL (e.g., `https://mindecho.test`).
+
+## Typical terminal layout
+- Terminal A: `php artisan queue:work`
+- Terminal B: `ollama serve`
+- Terminal C: `npm run dev`
+- Herd app: running/serving PHP automatically
+
+## Optional: Contact form (EmailJS)
+This project’s contact form uses EmailJS on the client side.
+
+To enable it with your own account, add these variables to `.env` and restart the Vite dev server:
+
+```dotenv
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_USER_ID=your_public_key
+```
+
+Notes:
+- These are frontend (Vite) env vars; values end up in the built JS. Protect your EmailJS account by restricting allowed origins/domains.
+- Keep real values out of source control; set them only in local `.env` or production environment.
+- If unset, the app still runs; the contact form will show a friendly notice instead of sending.
+

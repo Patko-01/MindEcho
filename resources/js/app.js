@@ -489,16 +489,26 @@ document.querySelectorAll(".model-delete-form").forEach(form => {
 
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
-    const EMAILJS_SERVICE_ID = 'service_bl4y65j';
-    const EMAILJS_TEMPLATE_ID = 'template_3bdyys8';
-    const EMAILJS_USER_ID = 'f6honLRkEsay40gZ0';
+    // Read EmailJS credentials from Vite env
+    const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const EMAILJS_USER_ID = import.meta.env.VITE_EMAILJS_USER_ID;
 
     const submitBtn = document.getElementById('contact-submit');
     let emailjsLoaded = false;
 
+    function missingEnv() {
+        return !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_USER_ID;
+    }
+
     // Load EmailJS script
     function loadEmailJS() {
         return new Promise((resolve, reject) => {
+            if (missingEnv()) {
+                alert('EmailJS is not configured properly. Please contact the site administrator.');
+                reject(new Error('EmailJS env variables are not configured'));
+                return;
+            }
             if (window.emailjs) {
                 if (!emailjsLoaded) {
                     window.emailjs.init(EMAILJS_USER_ID);
