@@ -54,7 +54,7 @@ class DashboardController extends Controller
         $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
         $title = 'Untitled Entry';
         try {
-            $ollamaTitleResponse = Http::post($ollamaHost . '/api/generate', [
+            $ollamaTitleResponse = Http::timeout(0)->post($ollamaHost . '/api/generate', [
                 'model' => 'llama3.2:latest',
                 'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
                 'prompt' => $data['content'],
@@ -74,7 +74,7 @@ class DashboardController extends Controller
 
         $question = 'What feels most important about this moment?';
         try {
-            $ollamaResponse = Http::post($ollamaHost . '/api/generate', [
+            $ollamaResponse = Http::timeout(0)->post($ollamaHost . '/api/generate', [
                 'model' => $model,
                 'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to ask one thoughtful, open-ended question that helps the user reflect deeper on their emotions, values, needs, or motivations. No advices. No explanations. Only the question, no extra words.',
                 'prompt' => $data['content'],

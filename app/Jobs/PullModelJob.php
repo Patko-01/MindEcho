@@ -37,7 +37,24 @@ class PullModelJob implements ShouldQueue
         ]);
 
         if ($response->failed()) {
-            throw new RuntimeException('Ollama pull failed with status ' . $response->status());
+            throw new RuntimeException("Ollama pull failed with status " . $response->status());
+        }
+
+        $lines = explode("\n", trim($response->body()));
+
+        foreach ($lines as $line) {
+            if ($line === '') {
+                continue;
+            }
+
+            $json = json_decode($line, true);
+            if (!is_array($json)) {
+                continue;
+            }
+
+            if (isset($json['error'])) {
+                throw new RuntimeException("Ollama pull failed " . $json['error']);
+            }
         }
 
         Models::firstOrCreate(
