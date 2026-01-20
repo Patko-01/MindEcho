@@ -23,13 +23,11 @@
         </form>
 
         <div class="text-center mt-3">
-            <small class="text-muted">Don't like your account?
-                <!-- DELETE form must be outside the update form to avoid nested forms -->
-            </small>
+            <small class="text-muted">Don't like your account?</small>
         </div>
 
         <div class="text-center">
-            <form id="profile-delete-form" action="{{ route('profile.destroy') }}" method="POST" class="d-inline">
+            <form id="profile-delete-form" action="{{ route('profile.destroy') }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-link p-0 m-0 align-baseline link-primary">Delete account</button>

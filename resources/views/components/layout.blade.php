@@ -109,6 +109,10 @@
                 @auth
                     <li class="nav-item mb-2"><a href="{{ route('dashboard') }}" class="nav-link p-0 text-body-secondary">Dashboard</a></li>
                 @endauth
+
+                @can('access-admin')
+                    <li class="nav-item mb-2"><a href="{{ route('admin') }}" class="nav-link p-0 text-body-secondary">Admin</a></li>
+                @endcan
             </ul>
         </div>
         <div class="col mb-3"><h5>Contact</h5>
