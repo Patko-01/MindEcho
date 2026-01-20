@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="container form-container p-5 mt-5 mb-5">
+    <div class="container form-container p-3 mt-5 mb-5">
         <h2>Contact</h2>
         <form id="contact-form" action="#" method="POST">
             @csrf <!-- CSRF token for security (cross site request forgery) -->
@@ -19,7 +19,7 @@
 
             <div class="mb-3">
                 <label for="loginPersonEmail" class="form-label">Email</label>
-                <input type="email" placeholder="Email" value="{{ old('email', auth()->user()?->email) }}" name="email" class="form-control" id="loginPersonEmail" aria-describedby="personEmailHelp" required>
+                <input type="email" placeholder="Email" value="{{ old('email', auth()->user()->getEmailForPasswordReset()) }}" name="email" class="form-control" id="loginPersonEmail" aria-describedby="personEmailHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="email"></div>
             </div>
             <div class="mb-3">

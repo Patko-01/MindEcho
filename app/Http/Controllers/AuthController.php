@@ -50,7 +50,7 @@ class AuthController extends Controller
         }
 
         throw ValidationException::withMessages([
-            'credentials' => 'The provided credentials do not match our records.',
+            'credentials' => 'Incorrect email or password.',
         ]);
     }
 

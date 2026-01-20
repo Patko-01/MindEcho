@@ -2,25 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class ProfileController extends Controller
 {
-    public function index(): Factory|View
+    private function authorizeUserAccess(int $id): ?User
     {
-        return view('profile.edit');
+        $user = User::findOrFail($id);
+
+        // If admin (can access-admin), allow editing any user
+        if (Gate::allows('access-admin')) {
+            return $user;
+        }
+
+        if (Auth::user()->getAuthIdentifier() !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return $user;
     }
-    public function update(Request $request): Redirector|RedirectResponse
+
+    public function index(int $id): Factory|View
     {
-        $user = $request->user();
+        $user = $this->authorizeUserAccess($id);
+        return view('profile.edit', ['user' => $user]);
+    }
+
+    public function update(Request $request, int $id): Redirector|RedirectResponse
+    {
+        $user = $this->authorizeUserAccess($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:users,name,' . $user->id,
+            'name' => 'required|string|max:255|unique:users,name,' . $user->getAuthIdentifier(),
             'password' => 'nullable|string|min:8',
         ]);
 
@@ -28,27 +48,40 @@ class ProfileController extends Controller
             'name' => $validated['name'],
         ];
 
-        // Only set the password when the user actually submitted a non-empty password
         if ($request->filled('password')) {
             $data['password'] = $validated['password'];
         }
 
         $user->update($data);
 
-        return redirect()->route('home')->with('status', 'Profile updated successfully.');
-    }
-    public function destroy(Request $request): Redirector|RedirectResponse
-    {
-        $user = $request->user();
+        $route = 'home';
 
-        Auth::logout();
+        if (Gate::allows('access-admin')) {
+            $route = 'admin';
+        }
+
+        return redirect()->route($route);
+    }
+
+    public function destroy(Request $request, int $id): Redirector|RedirectResponse
+    {
+        $user = $this->authorizeUserAccess($id);
+
+        // If deleting own account, logout first
+        if (Auth::id() === $user->getAuthIdentifier()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         $user->delete();
 
-        // Invalidate the session
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $route = 'home';
 
-        return redirect()->route('home')->with('status', 'Profile deleted successfully.');
+        if (Gate::allows('access-admin')) {
+            $route = 'admin';
+        }
+
+        return redirect()->route($route)->with('success', 'Profile deleted successfully.');
     }
 }

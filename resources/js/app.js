@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!search) {
         return;
     }
-    const items = Array.from(document.querySelectorAll('.list-group .list-group-item'));
+    const items = Array.from(document.querySelectorAll('.list-group .list-group-item.model'));
     if (items.length === 0) {
         return;
     }
@@ -187,6 +187,31 @@ document.addEventListener('DOMContentLoaded', function () {
         items.forEach(li => {
             const name = li.querySelector('.item-text')?.textContent.toLowerCase() || '';
             if (!name.includes(searchValue)) {
+                li.classList.add("visually-hidden");
+            } else {
+                li.classList.remove("visually-hidden");
+            }
+        });
+    });
+});
+
+// admin users search functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const searchUser = document.getElementById('userSearch');
+    if (!searchUser) {
+        return;
+    }
+    const items = Array.from(document.querySelectorAll('.list-group .list-group-item.user'));
+    if (items.length === 0) {
+        return;
+    }
+
+    searchUser.addEventListener('input', function () {
+        const searchUserValue = searchUser.value.trim().toLowerCase();
+
+        items.forEach(li => {
+            const name = li.querySelector('.item-text')?.textContent.toLowerCase() || '';
+            if (!name.includes(searchUserValue)) {
                 li.classList.add("visually-hidden");
             } else {
                 li.classList.remove("visually-hidden");
@@ -276,6 +301,59 @@ function validatePasswordConfirmation(password, confirmation) {
 
 document.addEventListener('DOMContentLoaded', () => {
     (function() {
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            const submitBtn = document.getElementById('login-submit');
+
+            function validateLoginForm(data) {
+                const errors = {};
+                const emailErr = validateEmail(data.email || '');
+                const passwordErr = validatePassword(data.password || '', true);
+                if (emailErr) {
+                    errors.email = emailErr;
+                }
+                if (passwordErr) {
+                    errors.password = passwordErr;
+                }
+                return errors;
+            }
+
+            // Real-time validation on input
+            loginForm.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => {
+                    const data = formToObject(loginForm);
+                    const name = input.name;
+                    let error = '';
+
+                    if (name === 'email') {
+                        error = validateEmail(data.email || '');
+                    }
+                    if (name === 'password') {
+                        error = validatePassword(data.password || '', true);
+                    }
+
+                    if (error) {
+                        showError(loginForm, name, error);
+                    } else {
+                        clearFieldError(loginForm, name);
+                    }
+                });
+            });
+
+            // Form submit
+            loginForm.addEventListener('submit', async function (e) {
+                clearErrors(loginForm);
+
+                const data = formToObject(loginForm);
+                const errors = validateLoginForm(data);
+
+                if (Object.keys(errors).length) {
+                    showErrors(loginForm, errors);
+                    e.preventDefault();
+                }
+            });
+        }
+
         const registerForm = document.getElementById('register-form');
         if (registerForm) {
             const submitBtn = document.getElementById('register-submit');

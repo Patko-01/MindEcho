@@ -14,9 +14,9 @@ Route::controller(HomeController::class)->group(function () {
 });
 
 Route::middleware('auth')->controller(ProfileController::class)->group(function () {
-    Route::get('/profile', 'index')->name('show.profile.edit');
-    Route::post('/profile', 'update')->name('profile.update');
-    Route::delete('/profile', 'destroy')->name('profile.destroy');
+    Route::get('/profile/{id}', 'index')->name('show.profile.edit');
+    Route::post('/profile/{id}', 'update')->name('profile.update');
+    Route::delete('/profile/{id}', 'destroy')->name('profile.destroy');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -32,10 +32,10 @@
             </div>
 
             @if($errors->any())
-                <div class="alert alert-danger mt-3">
-                    <ul>
+                <div class="alert mt-3 p-0">
+                    <ul class="p-0 m-0">
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li class="text-decoration-none list-unstyled text-danger">{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>

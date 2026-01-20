@@ -1,6 +1,6 @@
 <x-layout>
-    <div class="container form-container p-5 mt-5 mb-5">
-        <h2 class="mb-4">Add model</h2>
+    <div class="container form-container p-3 mt-5 mb-5">
+        <h2 class="mb-3">Add model</h2>
         <form action="{{ route('admin.addModel') }}" method="POST">
             @csrf <!-- CSRF token for security (cross site request forgery) -->
             <div class="mb-3">
@@ -14,23 +14,23 @@
             <button type="submit" class="midBtn btn btn-dark w-100">Submit</button>
 
             @if($errors->any())
-                <div class="alert alert-danger mt-3">
-                    <ul>
+                <div class="alert mt-3 p-0">
+                    <ul class="p-0 m-0">
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li class="text-decoration-none list-unstyled text-danger">{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
         </form>
 
-        <div class="mt-5 mb-4 d-flex justify-content-between align-items-center">
+        <div class="mt-5 mb-3 d-flex justify-content-between align-items-center">
             <h2>Models</h2>
             <input id="modelSearch" class="form-control w-50" type="search" placeholder="Search model" aria-label="SearchModel"/>
         </div>
         <ul class="list-group">
             @foreach($models as $model)
-                <li class="list-group-item p-3 border-1 d-flex justify-content-between align-items-center">
+                <li class="list-group-item model p-3 border-1 d-flex justify-content-between align-items-center">
                     <div>
                         <span class="item-text">{{ $model->name }}</span><br>
                         <small class="text-muted">{{ $model->description }}</small>
@@ -45,6 +45,29 @@
                             </svg>
                         </button>
                     </form>
+                </li>
+            @endforeach
+        </ul>
+
+        <div class="mt-5 mb-3 d-flex justify-content-between align-items-center">
+            <h2>Users</h2>
+            <input id="userSearch" class="form-control w-50" type="search" placeholder="Search user" aria-label="SearchUser"/>
+        </div>
+        <ul class="list-group">
+            @foreach($users as $user)
+                <li class="list-group-item user p-3 border-1 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="item-text">{{ $user->name }}</span><br>
+                        <small class="text-muted">{{ $user->email }}</small>
+                    </div>
+                    <a class="m-0" href="{{ route('show.profile.edit', $user->id) }}">
+                        <button type="submit" class="btn m-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                            </svg>
+                        </button>
+                    </a>
                 </li>
             @endforeach
         </ul>

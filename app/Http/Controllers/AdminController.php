@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Models;
+use App\Models\User;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -16,8 +17,9 @@ class AdminController extends Controller
     public function index(): Factory|View
     {
         $models = Models::all();
+        $users = User::all();
 
-        return view('pages.admin')->with('models', $models);
+        return view('pages.admin')->with('models', $models)->with('users', $users);
     }
 
     public function addModel(Request $request): RedirectResponse
