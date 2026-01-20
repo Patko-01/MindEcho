@@ -47,32 +47,34 @@
 
             @php $newEntry = session('entry'); @endphp
             @if ($newEntry && $newEntry['tag'] == "Thoughts")
-                <form method="POST" id="removableForm" action="{{ route('dashboard.destroy') }}">
-                    @csrf
-                    @method('DELETE')
-                    <div class="item-box d-inline-flex gap-2 align-items-center p-2">
-                        <input name="entry_id" value="{{ $newEntry['id'] }}"
-                               class="form-check-input mt-0 submit-on-check" type="checkbox"
-                               aria-label="Mark entry '{{ $newEntry['entry_title'] }}' as completed">
-                        <span class="item-text">{{ $newEntry['entry_title'] }}</span>
-                        <span class="item-text">•</span>
-                        <span class="item-date">{{ $newEntry['created_at']->format('d.m.Y H:i') }}</span>
-                    </div>
-                    <div class="card item-box mt-1 p-0">
-                        <div class="card-body">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                            </svg>
-                            <p class="card-text">{{ $newEntry['content'] }}</p>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-anthropic" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M9.218 2h2.402L16 12.987h-2.402zM4.379 2h2.512l4.38 10.987H8.82l-.895-2.308h-4.58l-.896 2.307H0L4.38 2.001zm2.755 6.64L5.635 4.777 4.137 8.64z"/>
-                            </svg>
-                            <p class="card-text mb-0">{{ $newEntry['aiQuestion'] }}</p>
-                            <span class="text-muted float-end">{{ $newEntry['model'] }}</span>
+                <div class="mt-3">
+                    <form method="POST" id="removableForm" action="{{ route('dashboard.destroy') }}">
+                        @csrf
+                        @method('DELETE')
+                        <div class="item-box d-inline-flex gap-2 align-items-center p-2">
+                            <input name="entry_id" value="{{ $newEntry['id'] }}"
+                                   class="form-check-input mt-0 submit-on-check" type="checkbox"
+                                   aria-label="Mark entry '{{ $newEntry['entry_title'] }}' as completed">
+                            <span class="item-text">{{ $newEntry['entry_title'] }}</span>
+                            <span class="item-text">•</span>
+                            <span class="item-date">{{ $newEntry['created_at']->format('d.m.Y H:i') }}</span>
                         </div>
-                    </div>
-                </form>
+                        <div class="card item-box mt-1 p-0">
+                            <div class="card-body">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                                </svg>
+                                <p class="card-text">{{ $newEntry['content'] }}</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-anthropic" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M9.218 2h2.402L16 12.987h-2.402zM4.379 2h2.512l4.38 10.987H8.82l-.895-2.308h-4.58l-.896 2.307H0L4.38 2.001zm2.755 6.64L5.635 4.777 4.137 8.64z"/>
+                                </svg>
+                                <p class="card-text mb-0">{{ $newEntry['aiQuestion'] }}</p>
+                                <span class="text-muted float-end">{{ $newEntry['model'] }}</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             @endif
         </div>
 

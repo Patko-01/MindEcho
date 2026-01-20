@@ -25,7 +25,7 @@
         </form>
 
         <div class="mt-5 mb-3 d-flex justify-content-between align-items-center">
-            <h2>Models</h2>
+            <h2>Manage models</h2>
             <input id="modelSearch" class="form-control w-50" type="search" placeholder="Search model" aria-label="SearchModel"/>
         </div>
         <ul class="list-group">
@@ -50,7 +50,7 @@
         </ul>
 
         <div class="mt-5 mb-3 d-flex justify-content-between align-items-center">
-            <h2>Users</h2>
+            <h2>Manage accounts</h2>
             <input id="userSearch" class="form-control w-50" type="search" placeholder="Search user" aria-label="SearchUser"/>
         </div>
         <ul class="list-group">

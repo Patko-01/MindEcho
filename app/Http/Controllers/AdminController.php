@@ -47,7 +47,7 @@ class AdminController extends Controller
             $response = Http::timeout(0)->delete($ollamaHost . '/api/delete', [
                 'name' => $model->name,
             ]);
-            if ($response->successful() || $response->json('status') === 'deleted') {
+            if ($response->successful() || $response->getStatusCode() === 404 || $response->json('status') === 'deleted') {
                 $model->delete();
                 return redirect()->route('admin')->with('success', 'Model deleted successfully.');
             } else {
