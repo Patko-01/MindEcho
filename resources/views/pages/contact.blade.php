@@ -7,19 +7,19 @@
             <div class="d-flex mb-3 mt-4 gap-3">
                 <div class="flex-fill">
                     <label for="firstName" class="form-label">First name</label>
-                    <input type="text" placeholder="First name" name="firstName" class="form-control" id="firstName" aria-describedby="personFirstNameHelp" required>
+                    <input type="text" placeholder="First name" name="firstName" class="form-control" autocomplete="on" id="firstName" aria-describedby="personFirstNameHelp" required>
                     <div class="field-error text-danger small mt-1" data-for="firstName"></div>
                 </div>
                 <div class="flex-fill">
                     <label for="lastName" class="form-label">Last name</label>
-                    <input type="text" placeholder="Last name" name="lastName" class="form-control" id="lastName" aria-describedby="personLastNameHelp" required>
+                    <input type="text" placeholder="Last name" name="lastName" class="form-control" autocomplete="on" id="lastName" aria-describedby="personLastNameHelp" required>
                     <div class="field-error text-danger small mt-1" data-for="lastName"></div>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="loginPersonEmail" class="form-label">Email</label>
-                <input type="email" placeholder="Email" value="{{ old('email', auth()->user()->getEmailForPasswordReset()) }}" name="email" class="form-control" id="loginPersonEmail" aria-describedby="personEmailHelp" required>
+                <input type="email" placeholder="Email" autocomplete="off" value="{{ old('email', auth()->user()->getEmailForPasswordReset()) }}" name="email" class="form-control" id="loginPersonEmail" aria-describedby="personEmailHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="email"></div>
             </div>
             <div class="mb-3">

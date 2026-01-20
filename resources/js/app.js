@@ -303,8 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
     (function() {
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
-            const submitBtn = document.getElementById('login-submit');
-
             function validateLoginForm(data) {
                 const errors = {};
                 const emailErr = validateEmail(data.email || '');
