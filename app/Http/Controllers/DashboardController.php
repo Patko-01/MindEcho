@@ -37,8 +37,8 @@ class DashboardController extends Controller
 
     private function buildConversationPrompt(int $entryId): string
     {
-        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->get()->take(-10);
-        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->get()->take(-10);
+        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->take(10)->get()->reverse();
+        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->take(10)->get()->reverse();
 
         $prompt = '';
 
@@ -78,16 +78,16 @@ class DashboardController extends Controller
         return <<<PROMPT
         You are a journaling assistant helping a user reflect over time.
 
-        You will receive a conversation consisting of:
-        - The user's journal entries
-        - Your previous reflective questions
+        You will receive messages from the user which may include:
+        - Journal entries
+        - Previous reflections
+        - Casual comments or jokes
 
         Your task:
-        - Ask ONE thoughtful, open-ended question
-        - Help the user reflect deeper on emotions, values, needs, or motivations
-        - Do NOT give advice
-        - Do NOT explain
-        - Output ONLY the question
+        - Ask ONE thoughtful, open-ended question about the user’s feelings, values, or experiences.
+        - If the user writes something unrelated or playful, you may lightly acknowledge it in the question, but continue reflecting.
+        - Do NOT give advice, explanations, or instructions.
+        - Output ONLY the question.
         PROMPT;
     }
 

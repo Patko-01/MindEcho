@@ -12,8 +12,7 @@
                     <ul class="dropdown-menu" aria-labelledby="AIModelsDropdownButton">
                         @foreach($models as $model)
                             <li>
-                                <button type="button" class="btn btn-sm w-100 js-model-toggle"
-                                        aria-labelledby="AIModel {{ $model }}">{{ $model }}</button>
+                                <button type="button" class="btn btn-sm w-100 js-model-toggle" aria-labelledby="AIModel {{ $model }}">{{ $model }}</button>
                             </li>
                         @endforeach
                     </ul>
