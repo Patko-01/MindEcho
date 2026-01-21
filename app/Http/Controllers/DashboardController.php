@@ -3,18 +3,94 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
-use App\Models\Models;
+use App\Models\AiModel;
+use App\Models\Note;
 use App\Models\Response;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Http\Client\ConnectionException;
+use Throwable;
 
 class DashboardController extends Controller
 {
+    private function getConversation(int $entryId): Collection
+    {
+        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->get();
+        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->get();
+
+        $conversation = collect();
+        foreach ($notes as $i => $note) {
+            $conversation->push([
+                'note' => $note->content,
+                'model_name' => $responses[$i]->model_name ?? null,
+                'response' => $responses[$i]->content ?? null,
+            ]);
+        }
+
+        return $conversation;
+    }
+
+    private function buildConversationPrompt(int $entryId): string
+    {
+        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->get()->take(-10);
+        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->get()->take(-10);
+
+        $prompt = '';
+
+        foreach ($notes as $index => $note) {
+            $prompt .= "User ({$note->created_at->format('Y-m-d H:i')}):\n";
+            $prompt .= trim($note->content) . "\n\n";
+
+            if (isset($responses[$index])) {
+                $prompt .= "Assistant:\n";
+                $prompt .= trim($responses[$index]->content) . "\n\n";
+            }
+        }
+
+        return trim($prompt);
+    }
+
+    private function generateTitle(string $content, string $ollamaHost): string
+    {
+        $firstModel = AiModel::orderBy('id')->firstOrFail();
+
+        try {
+            $response = Http::timeout(0)->post($ollamaHost . '/api/generate', [
+                'model' => $firstModel->name,
+                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
+                'prompt' => $content,
+                'stream' => false,
+            ]);
+
+            return trim($response->json('response') ?: 'Untitled Entry', "\" \n\t.");
+        } catch (Throwable) {
+            return 'Untitled Entry';
+        }
+    }
+
+    private function reflectionSystemPrompt(): string
+    {
+        return <<<PROMPT
+        You are a journaling assistant helping a user reflect over time.
+
+        You will receive a conversation consisting of:
+        - The user's journal entries
+        - Your previous reflective questions
+
+        Your task:
+        - Ask ONE thoughtful, open-ended question
+        - Help the user reflect deeper on emotions, values, needs, or motivations
+        - Do NOT give advice
+        - Do NOT explain
+        - Output ONLY the question
+        PROMPT;
+    }
+
     public function index(Request $request): Factory|View
     {
         $user = $request->user();
@@ -22,11 +98,10 @@ class DashboardController extends Controller
         $entries = Entry::query()->where('user_id', $user->id)->latest()->get();
         $data = $entries->groupBy('tag');
 
-        $models = Models::pluck('name');
+        $models = AiModel::pluck('name');
 
-        $sessionModel = session('model');
-        $usedModel = $sessionModel && $models->contains($sessionModel)
-            ? $sessionModel
+        $usedModel = session('model') && $models->contains(session('model'))
+            ? session('model')
             : ($models->first() ?? 'llama3.2:latest');
 
         return view('pages.dashboard', compact('data', 'models', 'usedModel'));
@@ -37,14 +112,16 @@ class DashboardController extends Controller
         $data = $request->validate([
             'content' => 'required|string',
             'tag' => 'required|string',
-            'model' => 'nullable|string|exists:models,name',
+            'model' => 'required|string|exists:ai_models,name',
+            'old_entry_id' => 'nullable|integer|exists:entries,id',
         ]);
 
         $tag = $data['tag'];
         $model = $data['model'];
 
         if ($data['tag'] != "Thoughts") {
-            $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $data['content'], 'tag' => $data['tag'], 'content' => $data['content']]);
+            $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $data['content'], 'tag' => $data['tag']]);
+            Note::create(['entry_id' => $entry->id, 'content' => $data['content']]);
             return redirect()->route('dashboard')
                 ->with('tag', $tag)
                 ->with('model', $model)
@@ -52,39 +129,29 @@ class DashboardController extends Controller
         }
 
         $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
-        $title = 'Untitled Entry';
-        try {
-            $ollamaTitleResponse = Http::timeout(0)->post($ollamaHost . '/api/generate', [
-                'model' => 'llama3.2:latest',
-                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
-                'prompt' => $data['content'],
-                'stream' => false,
-            ]);
-            $titleRaw = $ollamaTitleResponse->json('response');
-            $maybeTitle = is_string($titleRaw) ? trim($titleRaw) : '';
-            if (!empty($maybeTitle)) {
-                $title = trim($maybeTitle, "\" \n\t.");
-            }
-        } catch (ConnectionException $e) {
-            return redirect()->route('dashboard')
-                ->with('tag', $tag)
-                ->with('model', $model)
-                ->with('error', $e->getMessage());
+
+        if (isset($data['old_entry_id'])) {
+            $entry = Entry::where('id', $data['old_entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
+            $title = $entry->entry_title;
+
+            $prompt = $this->buildConversationPrompt($data['old_entry_id']);
+        } else {
+            $title = $this->generateTitle($data['content'], $ollamaHost);
+            $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $tag]);
+
+            $prompt = '';
         }
 
-        $question = 'What feels most important about this moment?';
+        $prompt .= "\n\nUser (" . now()->format('Y-m-d H:i') . "):\n";
+        $prompt .= trim($data['content']);
+
         try {
             $ollamaResponse = Http::timeout(0)->post($ollamaHost . '/api/generate', [
                 'model' => $model,
-                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to ask one thoughtful, open-ended question that helps the user reflect deeper on their emotions, values, needs, or motivations. No advices. No explanations. Only the question, no extra words.',
-                'prompt' => $data['content'],
+                'system' => $this->reflectionSystemPrompt(),
+                'prompt' => $prompt,
                 'stream' => false,
             ]);
-            $questionRaw = $ollamaResponse->json('response');
-            $maybeQuestion = is_string($questionRaw) ? trim($questionRaw) : '';
-            if (!empty($maybeQuestion)) {
-                $question = $maybeQuestion;
-            }
         } catch (ConnectionException $e) {
             return redirect()->route('dashboard')
                 ->with('tag', $tag)
@@ -92,14 +159,15 @@ class DashboardController extends Controller
                 ->with('error', $e->getMessage());
         }
 
-        $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $title, 'tag' => $tag, 'content' => $data['content']]);
+        $question = trim($ollamaResponse->json('response') ?? 'What feels most important about this moment?');
+
+        Note::create(['entry_id' => $entry->id, 'content' => $data['content']]);
         Response::create(['entry_id' => $entry->id, 'model_name' => $model,'content' => $question]);
 
         $payload = [
             'id' => $entry->id,
             'entry_title' => $title,
-            'content' => $data['content'],
-            'aiQuestion' => $question,
+            'conversation' => $this->getConversation($entry->id),
             'created_at' => $entry->created_at,
             'tag' => 'Thoughts',
             'model' => $model,
@@ -118,16 +186,13 @@ class DashboardController extends Controller
         ]);
 
         $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
-        $response = Response::where('entry_id', $entry->id)->firstOrFail();
 
         $payload = [
             'id' => $entry->id,
             'entry_title' => $entry->entry_title,
-            'content' => $entry->content,
-            'aiQuestion' => $response->content,
+            'conversation' => $this->getConversation($entry->id),
             'created_at' => $entry->created_at,
             'tag' => $entry->tag,
-            'model' => $response->model_name,
         ];
 
         return redirect()->route('dashboard')
@@ -144,6 +209,7 @@ class DashboardController extends Controller
         $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
 
         $entry->response()->delete();
+        $entry->note()->delete();
         $entry->delete();
 
         return response()->noContent();

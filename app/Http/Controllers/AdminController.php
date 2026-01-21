@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models;
+use App\Models\AiModel;
 use App\Models\User;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -16,7 +16,7 @@ class AdminController extends Controller
 {
     public function index(): Factory|View
     {
-        $models = Models::all();
+        $models = AiModel::all();
         $users = User::all();
 
         return view('pages.admin')->with('models', $models)->with('users', $users);
@@ -40,7 +40,7 @@ class AdminController extends Controller
             'modelId' => 'required|integer|exists:models,id',
         ]);
 
-        $model = Models::findOrFail($data['modelId']);
+        $model = AiModel::findOrFail($data['modelId']);
 
         $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
         try {

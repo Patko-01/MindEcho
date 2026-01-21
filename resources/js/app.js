@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tagButton = document.getElementById('tagButton');
         const hiddenInput = document.getElementById('selectedTagInput');
         const textarea = document.getElementById('dashboard-input');
+        const visibilityButton = document.getElementById('toggle-visibility-button');
 
         if (!tagButton || !hiddenInput || !textarea) {
             return;
@@ -25,6 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
             hiddenInput.type = 'hidden';
             tagButton.style.display = 'inline-block';
             textarea.focus();
+        }
+
+        if (visibilityButton) {
+            visibilityButton.addEventListener('click', () => {
+                window.location.reload();
+            });
         }
 
         tagButton.addEventListener('click', () => {
@@ -122,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             const entryId = closestForm.querySelector('input[name="entry_id"]').value;
                             if (removableForm === closestForm) { // remove the display message only if the checkbox inside display message was clicked
                                 removableForm.remove();
+                                document.getElementById("old_entry_id").value = '';
 
                                 const forms = document.querySelectorAll('.tag-Thoughts');
                                 let targetForm = null;
@@ -142,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else {
                                 if (entryId && removableForm.querySelector('input[name="entry_id"]').value === entryId) {
                                     removableForm.remove();
+                                    document.getElementById("old_entry_id").value = '';
                                 }
                             }
                         }

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Models;
+use App\Models\AiModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -57,7 +57,7 @@ class PullModelJob implements ShouldQueue
             }
         }
 
-        Models::firstOrCreate(
+        AiModel::firstOrCreate(
             ['name' => $this->modelName],
             ['description' => $this->modelDescription]
         );

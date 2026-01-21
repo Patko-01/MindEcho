@@ -6,22 +6,22 @@
 
             <div class="mb-3 mt-4">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" value="{{ old('name') }}" name="name" class="form-control" id="name" autocomplete="off" aria-describedby="personNameHelp" required>
+                <input type="text" value="{{ old('name') }}" name="name" class="form-control" id="name" autocomplete="on" aria-describedby="personNameHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="name"></div>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" value="{{ old('email') }}" name="email" class="form-control" id="email" autocomplete="off" aria-describedby="personEmailHelp" required>
+                <input type="email" value="{{ old('email') }}" name="email" class="form-control" id="email" autocomplete="on" aria-describedby="personEmailHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="email"></div>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" id="password" autocomplete="off" aria-describedby="personPasswordHelp" required>
+                <input type="password" name="password" class="form-control" id="password" autocomplete="on" aria-describedby="personPasswordHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="password"></div>
             </div>
             <div class="mb-3">
                 <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input type="password" name="password_confirmation" class="form-control" id="password_confirmation" autocomplete="off" aria-describedby="personPasswordHelp" required>
+                <input type="password" name="password_confirmation" class="form-control" id="password_confirmation" autocomplete="on" aria-describedby="personPasswordHelp" required>
                 <div class="field-error text-danger small mt-1" data-for="password_confirmation"></div>
             </div>
 
