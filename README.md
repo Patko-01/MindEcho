@@ -95,28 +95,41 @@ Ensure your `.env` database settings match SQLite:
 php artisan migrate
 ```
 
-## 4) Start the queue worker
+## 4) Admin Role
+To grant a user admin privileges, you need to manually update the `is_admin` column in the database:
+
+```sql
+UPDATE users SET is_admin = 1 WHERE id = <user_id>;
+```
+
+Or via Laravel Tinker:
+```powershell
+php artisan tinker
+>>> \App\Models\User::find(<user_id>)->update(['is_admin' => true]);
+```
+
+## 5) Start the queue worker
 Keep a queue worker running in a separate terminal.
 
 ```powershell
 php artisan queue:work
 ```
 
-## 5) Start Ollama
+## 6) Start Ollama
 Start the local model server (separate terminal). If Ollama isn't already running:
 
 ```powershell
 ollama serve
 ```
 
-## 6) Start the frontend dev server (Vite)
+## 7) Start the frontend dev server (Vite)
 In another terminal, start Vite for hot-reload assets.
 
 ```powershell
 npm run dev
 ```
 
-## 7) Serve the PHP application (via Herd)
+## 8) Serve the PHP application (via Herd)
 Turn on Herd. It will auto-detect and serve the app (no need to run `php artisan serve`).
 
 Then visit your Herd site URL (e.g., `https://mindecho.test`).

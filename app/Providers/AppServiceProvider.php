@@ -29,9 +29,8 @@ class AppServiceProvider extends ServiceProvider
             Paginator::useBootstrap();
         }
 
-        // Gate to restrict admin access to user with id == 1
         Gate::define('access-admin', function ($user) {
-            return $user && (int) $user->id == 1;
+            return $user->is_admin;
         });
     }
 }
