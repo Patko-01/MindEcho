@@ -42,13 +42,13 @@ class DashboardController extends Controller
 
         $prompt = '';
 
-        foreach ($notes as $index => $note) {
+        foreach ($notes as $i => $note) {
             $prompt .= "User ({$note->created_at->format('Y-m-d H:i')}):\n";
             $prompt .= trim($note->content) . "\n\n";
 
-            if (isset($responses[$index])) {
+            if (isset($responses[$i])) {
                 $prompt .= "Assistant:\n";
-                $prompt .= trim($responses[$index]->content) . "\n\n";
+                $prompt .= trim($responses[$i]->content) . "\n\n";
             }
         }
 
@@ -73,7 +73,7 @@ class DashboardController extends Controller
         }
     }
 
-    private function reflectionSystemPrompt(): string
+    private function systemPrompt(): string
     {
         return <<<PROMPT
         You are a journaling assistant helping a user reflect over time.
@@ -99,10 +99,8 @@ class DashboardController extends Controller
         $data = $entries->groupBy('tag');
 
         $models = AiModel::pluck('name');
-
-        $usedModel = session('model') && $models->contains(session('model'))
-            ? session('model')
-            : ($models->first() ?? 'llama3.2:latest');
+        
+        $usedModel = session('usedModel', $models->first());
 
         return view('pages.dashboard', compact('data', 'models', 'usedModel'));
     }
@@ -124,7 +122,7 @@ class DashboardController extends Controller
             Note::create(['entry_id' => $entry->id, 'content' => $data['content']]);
             return redirect()->route('dashboard')
                 ->with('tag', $tag)
-                ->with('model', $model)
+                ->with('usedModel', $model)
                 ->with('entry', $entry->only(['id', 'entry_title', 'content', 'tag']));
         }
 
@@ -148,14 +146,14 @@ class DashboardController extends Controller
         try {
             $ollamaResponse = Http::timeout(0)->post($ollamaHost . '/api/generate', [
                 'model' => $model,
-                'system' => $this->reflectionSystemPrompt(),
+                'system' => $this->systemPrompt(),
                 'prompt' => $prompt,
                 'stream' => false,
             ]);
         } catch (ConnectionException $e) {
             return redirect()->route('dashboard')
                 ->with('tag', $tag)
-                ->with('model', $model)
+                ->with('usedModel', $model)
                 ->with('error', $e->getMessage());
         }
 
@@ -175,7 +173,7 @@ class DashboardController extends Controller
 
         return redirect()->route('dashboard')
             ->with('tag', $tag)
-            ->with('model', $model)
+            ->with('usedModel', $model)
             ->with('entry', $payload);
     }
 
@@ -196,7 +194,7 @@ class DashboardController extends Controller
         ];
 
         return redirect()->route('dashboard')
-            ->with('tag', session('tag', $entry->tag))
+            ->with('tag', $entry->tag)
             ->with('entry', $payload);
     }
 
