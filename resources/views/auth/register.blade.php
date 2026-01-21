@@ -25,7 +25,7 @@
                 <div class="field-error text-danger small mt-1" data-for="password_confirmation"></div>
             </div>
 
-            <button id="register-submit" type="submit" class="midBtn btn btn-dark w-100">Register</button>
+            <button id="register-submit" type="submit" class="midBtn btn btn-dark w-100" aria-label="Register">Register</button>
 
             <div class="text-center mt-3">
                 <small class="text-muted">Already have an account? <a href="{{ route('show.login') }}" class="link-primary">Sign in</a></small>

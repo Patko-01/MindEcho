@@ -15,15 +15,15 @@
 
             <ul class="custom-bullets mt-5">
                 <li>
-                    <img src="{{ Vite::asset('resources/assets/check2-circle.svg') }}" class="svg-icon me-3" alt="check">
+                    <img src="{{ Vite::asset('resources/assets/check2-circle.svg') }}" class="svg-icon me-3" alt="" aria-hidden="true">
                     Free to start.
                 </li>
                 <li>
-                    <img src="{{ Vite::asset('resources/assets/check2-circle.svg') }}" class="svg-icon me-3" alt="check">
+                    <img src="{{ Vite::asset('resources/assets/check2-circle.svg') }}" class="svg-icon me-3" alt="" aria-hidden="true">
                     100% Private & Safe.
                 </li>
                 <li>
-                    <img src="{{ Vite::asset('resources/assets/check2-circle.svg') }}" class="svg-icon me-3" alt="check">
+                    <img src="{{ Vite::asset('resources/assets/check2-circle.svg') }}" class="svg-icon me-3" alt="" aria-hidden="true">
                     Your data is never used to train AI.
                 </li>
             </ul>
@@ -38,30 +38,30 @@
             <div class="col-md-4 mb-5">
                 <h5>Manage Stress Effectively</h5>
                 <p class="heading-text lead">
-                    It is a long established fact that a reader will be distracted by the
-                    readable content of a page when looking at its layout. The point of
-                    using Lorem Ipsum is that it has a more-or-less normal distribution
-                    of letters.
+                    Writing down your thoughts helps release mental tension and reduces
+                    the weight of daily stress. By journaling regularly, you create a
+                    safe space to process emotions and find calm amidst the chaos of
+                    everyday life.
                 </p>
                 <img src="{{ Vite::asset('resources/assets/icon1.png') }}" class="about-icon" alt="icon">
             </div>
             <div class="col-md-4 mb-5">
                 <h5>Keep Your Thoughts Nearby</h5>
                 <p class="heading-text lead">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
-                    efficitur consectetur auctor. Maecenas sed tellus enim. Ut eu metus
-                    ut ipsum molestie mattis. Sed tempor et neque eget luctus.
-                    Suspendisse. asdfasdfasd a
+                    Capture fleeting ideas and meaningful reflections before they slip
+                    away. MindEcho keeps your entries organized and accessible, so you
+                    can revisit past insights and track your personal growth over time
+                    whenever you need.
                 </p>
                 <img src="{{ Vite::asset('resources/assets/icon2.png') }}" class="about-icon" alt="icon">
             </div>
             <div class="col-md-4 mb-5">
                 <h5>Brainstorm Your Ideas</h5>
                 <p class="heading-text lead">
-                    Curabitur id sagittis metus. Nunc feugiat, ligula nec gravida
-                    commodo, felis lorem auctor magna, a iaculis tellus elit sit amet
-                    elit. Pellentesque pharetra lectus consectetur nulla feugiat,
-                    non mattis urna fermentum.
+                    Transform scattered thoughts into actionable plans. Use your journal
+                    as a creative playground to explore new concepts, solve problems, and
+                    develop ideas without judgment. Your best breakthroughs often start
+                    with a simple note.
                 </p>
                 <img src="{{ Vite::asset('resources/assets/icon3.png') }}" class="about-icon" alt="icon">
             </div>

@@ -28,7 +28,7 @@
                 <div class="field-error text-danger small mt-1" data-for="messageContent"></div>
             </div>
 
-            <button id="contact-submit" type="submit" class="midBtn btn btn-dark w-100">Submit</button>
+            <button id="contact-submit" type="submit" class="midBtn btn btn-dark w-100" aria-label="Submit contact form">Submit</button>
         </form>
     </div>
 </x-layout>

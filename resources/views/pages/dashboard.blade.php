@@ -9,10 +9,10 @@
                        aria-expanded="false">
                         {{ $usedModel }}
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="AIModelsDropdownButton">
+                    <ul class="dropdown-menu" aria-labelledby="Displayed model">
                         @foreach($models as $model)
                             <li>
-                                <button type="button" class="btn btn-sm w-100 js-model-toggle" aria-labelledby="AI Model {{ $model }}">{{ $model }}</button>
+                                <button type="button" class="btn btn-sm w-100 js-model-toggle" aria-labelledby="Select AI model {{ $model }}">{{ $model }}</button>
                             </li>
                         @endforeach
                     </ul>
@@ -32,7 +32,7 @@
                             <span class="item-text">{{ $newEntry['entry_title'] }}</span>
                             <span class="item-text">•</span>
                             <span class="item-date">{{ $newEntry['created_at']->format('d.m.Y H:i') }}</span>
-                            <button class="btn btn-sm p-0 m-0 border-0" id="toggle-visibility-button" type="button" aria-label="ToggleVisibilityOfConversation">
+                            <button class="btn btn-sm p-0 m-0 border-0" id="toggle-visibility-button" type="button" aria-label="Toggle visibility of conversation">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
                                     <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
                                     <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
@@ -74,7 +74,7 @@
                     <div class="ms-1 d-flex">
                         <input type="hidden" name="tag" class="form-control form-control-sm w-auto"
                                id="selectedTagInput" value="{{ session('tag', 'Thoughts') }}">
-                        <button type="button" class="btn btn-sm text-secondary" id="tagButton">
+                        <button type="button" class="btn btn-sm text-secondary" id="tagButton" aria-label="Select tag">
                             #{{ session('tag', 'Thoughts') }}
                         </button>
                         <button class="btn icon-btn ms-auto" type="submit" aria-labelledby="Submit entry">
@@ -92,7 +92,7 @@
         <div class="col-12 col-lg-5">
             <div class="d-flex justify-content-between align-items-center">
                 <h2>Tags library</h2>
-                <button type="button" class="btn btn-sm border-0" aria-label="FilterTags" disabled>
+                <button type="button" class="btn btn-sm border-0" aria-label="Filter tags" disabled>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                          class="bi bi-funnel" viewBox="0 0 16 16">
                         <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z"/>
@@ -103,7 +103,8 @@
                 <div class="tag mb-3">
                     <div class="category-header d-flex justify-content-between align-items-center"
                          data-bs-toggle="collapse" data-bs-target="#{{ $tag }}"
-                         aria-expanded="{{ session('tag') === $tag ? 'true' : 'false' }}">
+                         aria-expanded="{{ session('tag') === $tag ? 'true' : 'false' }}"
+                         aria-label="Toggle {{ $tag }} entries">
                         <div class="d-flex align-items-center">
                         <span class="arrow me-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

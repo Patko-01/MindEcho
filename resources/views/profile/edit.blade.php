@@ -19,7 +19,7 @@
                 <div class="field-error text-danger small mt-1" data-for="password"></div>
             </div>
 
-            <button id="profile-submit" type="submit" class="midBtn btn btn-dark w-100">Save Changes</button>
+            <button id="profile-submit" type="submit" class="midBtn btn btn-dark w-100" aria-label="Save changes">Save Changes</button>
         </form>
 
         <div class="text-center mt-3">

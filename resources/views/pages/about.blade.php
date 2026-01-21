@@ -9,7 +9,7 @@
                 <p class="heading-text lead">Our mission is to empower individuals to take control of their mental health through accessible and effective solutions. We believe that everyone deserves the opportunity to lead a fulfilling life, and we're committed to providing the resources you need to achieve that goal.</p>
             </div>
             <div class="col-md-6 text-center">
-                <img src="{{ Vite::asset('resources/assets/imgMe.jpg') }}" alt="Picture of me" class="img-fluid rounded">
+                <img src="{{ Vite::asset('resources/assets/imgMe.jpg') }}" alt="About MindEcho" class="img-fluid rounded">
             </div>
         </div>
     </div>

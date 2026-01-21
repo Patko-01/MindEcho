@@ -15,7 +15,7 @@
                 <div class="field-error text-danger small mt-1" data-for="password"></div>
             </div>
 
-            <button id="login-submit" type="submit" class="midBtn btn btn-dark w-100">Login</button>
+            <button id="login-submit" type="submit" class="midBtn btn btn-dark w-100" aria-label="Login">Login</button>
 
             <div class="text-center mt-3">
                 <small class="text-muted">Don't have an account? <a href="{{ route('show.register') }}" class="link-primary">Sign up</a></small>

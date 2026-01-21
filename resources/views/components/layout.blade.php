@@ -63,7 +63,7 @@
                     <li class="nav-item">
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn authBtn ms-1">Logout</button>
+                            <button type="submit" class="btn authBtn ms-1" aria-label="Logout">Logout</button>
                         </form>
                     </li>
                 @endauth
