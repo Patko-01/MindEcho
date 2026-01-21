@@ -659,7 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const originalText = submitBtn ? submitBtn.textContent : '';
+                const btnText = submitBtn ? submitBtn.textContent : '';
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'Sending...';
@@ -687,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } finally {
                     if (submitBtn) {
                         submitBtn.disabled = false;
-                        submitBtn.textContent = originalText;
+                        submitBtn.textContent = btnText;
                     }
                 }
             });
