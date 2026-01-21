@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Entry extends Model
 {
-    protected $fillable = ['user_id', 'entry_title', 'tag', 'content'];
+    protected $fillable = ['user_id', 'entry_title', 'tag'];
 
     public function user(): BelongsTo
     {
@@ -23,5 +23,10 @@ class Entry extends Model
     public function response(): HasMany
     {
         return $this->hasMany(Response::class);
+    }
+
+    public function note(): HasMany
+    {
+        return $this->hasMany(Note::class);
     }
 }
