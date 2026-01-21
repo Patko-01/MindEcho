@@ -95,7 +95,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $entries = Entry::query()->where('user_id', $user->id)->latest()->get();
+        $entries = Entry::where('user_id', $user->id)->latest()->get();
         $data = $entries->groupBy('tag');
 
         $models = AiModel::pluck('name');
@@ -208,8 +208,6 @@ class DashboardController extends Controller
 
         $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
 
-        $entry->response()->delete();
-        $entry->note()->delete();
         $entry->delete();
 
         return response()->noContent();

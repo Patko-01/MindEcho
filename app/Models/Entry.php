@@ -20,12 +20,12 @@ class Entry extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function response(): HasMany
+    public function responses(): HasMany
     {
         return $this->hasMany(Response::class);
     }
 
-    public function note(): HasMany
+    public function notes(): HasMany
     {
         return $this->hasMany(Note::class);
     }

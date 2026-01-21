@@ -25,7 +25,7 @@ class AdminController extends Controller
     public function addModel(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'modelName' => 'required|string|max:255|unique:models,name',
+            'modelName' => 'required|string|max:255|unique:ai_models,name',
             'modelDescription' => 'required|string|max:255',
         ]);
 
@@ -37,7 +37,7 @@ class AdminController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'modelId' => 'required|integer|exists:models,id',
+            'modelId' => 'required|integer|exists:ai_models,id',
         ]);
 
         $model = AiModel::findOrFail($data['modelId']);

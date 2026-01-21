@@ -50,7 +50,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function entry(): HasMany
+    public function entries(): HasMany
     {
         return $this->hasMany(Entry::class);
     }

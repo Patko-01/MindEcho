@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +20,7 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-    public function register(Request $request)
+    public function register(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:users',
@@ -36,7 +37,7 @@ class AuthController extends Controller
     /**
      * @throws ValidationException when login fails due to invalid credentials
      */
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email' => 'required|email',
@@ -54,7 +55,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 

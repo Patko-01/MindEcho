@@ -13,7 +13,7 @@ class Response extends Model
 {
     protected $fillable = ['entry_id', 'model_name', 'content'];
 
-    public function entries(): BelongsTo
+    public function entry(): BelongsTo
     {
         return $this->belongsTo(Entry::class);
     }
