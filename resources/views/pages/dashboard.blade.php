@@ -29,7 +29,7 @@
                             <input name="entry_id" value="{{ $newEntry['id'] }}"
                                    class="form-check-input mt-0 submit-on-check" type="checkbox"
                                    aria-label="Mark entry '{{ $newEntry['entry_title'] }}' as completed">
-                            <span class="item-text">{{ $newEntry['entry_title'] }}</span>
+                            <span id="openedEntryTitle" class="item-text">{{ $newEntry['entry_title'] }}</span>
                             <span class="item-text">•</span>
                             <span class="item-date">{{ $newEntry['created_at']->format('d.m.Y H:i') }}</span>
                             <button class="btn btn-sm p-0 m-0 border-0" id="toggle-visibility-button" type="button" aria-label="Toggle visibility of conversation">

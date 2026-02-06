@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const textarea = document.getElementById('dashboard-input');
         const visibilityButton = document.getElementById('toggle-visibility-button');
 
+        const openedEntryTitle = document.getElementById("openedEntryTitle");
+        if (openedEntryTitle) {
+            document.title = openedEntryTitle.textContent;
+        }
+
         if (!tagButton || !hiddenInput || !textarea) {
             return;
         }
