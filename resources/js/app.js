@@ -129,6 +129,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (res.ok) {
                         const removableForm = document.getElementById("removableForm");
                         let section = closestForm.closest('.tag');
+                        let tagNameText = '';
+
+                        if (section) {
+                            const tagSpan = section.querySelector('.tagName');
+                            tagNameText = tagSpan ? tagSpan.textContent.trim() : '';
+                        }
 
                         if (removableForm) {
                             const entryId = closestForm.querySelector('input[name="entry_id"]').value;
@@ -169,6 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const remainingItems = section.querySelectorAll('.item-box').length;
                                 if (remainingItems === 0) {
                                     section.remove();
+                                    if (tagNameText) {
+                                        const filterTags = Array.from(document.getElementsByClassName('filterTag'));
+                                        filterTags.forEach(li => {
+                                            const label = li.querySelector('.form-check-label');
+                                            if (label && label.textContent.trim() === tagNameText) {
+                                                li.remove();
+                                            }
+                                        });
+                                    }
                                 }
                                 badge.textContent = remainingItems;
                             }
@@ -229,6 +244,87 @@ document.addEventListener('DOMContentLoaded', function () {
                 li.classList.add("visually-hidden");
             } else {
                 li.classList.remove("visually-hidden");
+            }
+        });
+    });
+});
+
+// dashboard entry search functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const searchEntry = document.getElementById('entrySearch');
+    if (!searchEntry) {
+        return;
+    }
+    const items = Array.from(document.querySelectorAll('.entry'));
+    if (items.length === 0) {
+        return;
+    }
+
+    searchEntry.addEventListener('input', function () {
+        const searchUserValue = searchEntry.value.trim().toLowerCase();
+        const sections = Array.from(document.querySelectorAll('.tag'));
+
+        sections.forEach(section => {
+            const header = section.querySelector('.category-header');
+            const collapseContent = section.querySelector('.collapse-content');
+            const entries = Array.from(section.querySelectorAll('.entry'));
+            let anyVisible = false;
+
+            entries.forEach(entry => {
+                const name = entry.querySelector('.item-text.d-block')?.textContent.trim().toLowerCase() || '';
+
+                if (!name.includes(searchUserValue)) {
+                    entry.classList.add('visually-hidden');
+                } else {
+                    entry.classList.remove('visually-hidden');
+                    anyVisible = true;
+                }
+            });
+
+            if (!header) {
+                return;
+            }
+
+            if (anyVisible && searchUserValue.length !== 0) {
+                header.classList.remove('collapsed');
+                header.setAttribute('aria-expanded', 'true');
+                if (collapseContent) {
+                    collapseContent.classList.add('show');
+                }
+            } else {
+                header.classList.add('collapsed');
+                header.setAttribute('aria-expanded', 'false');
+                if (collapseContent) {
+                    collapseContent.classList.remove('show');
+                }
+            }
+
+            if (!anyVisible) {
+                header.classList.add('visually-hidden');
+            } else {
+                header.classList.remove('visually-hidden');
+            }
+        });
+    });
+
+    const searchCheckboxes = Array.from(document.getElementsByClassName("filterCheckbox"));
+
+    searchCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const label = this.nextElementSibling;
+            const header = document.getElementById("header-" + label.innerText);
+
+            if (!header) {
+                return;
+            }
+            if (!label) {
+                return;
+            }
+
+            if (!this.checked) {
+                header.classList.add('visually-hidden');
+            } else {
+                header.classList.remove('visually-hidden');
             }
         });
     });

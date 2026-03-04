@@ -196,8 +196,17 @@ form .midBtn {
     margin-top: auto !important; /* push icon to the bottom of the column */
 }
 
-.input-group {
+.input-group.mainInput {
     min-height: 48px;
+}
+
+.input-group.filter {
+    width: 14rem;
+}
+
+#filterBtn {
+    border: 1px solid rgb(222, 226, 230);
+    border-left: none;
 }
 
 #dashboard-input {

@@ -63,7 +63,7 @@
 
             <form method="POST" action="{{ route('dashboard.newEntry') }}">
                 @csrf <!-- CSRF token for security (cross site request forgery) -->
-                <div class="input-group rounded-5 border px-3 py-2 flex-column">
+                <div class="input-group mainInput rounded-5 border px-3 py-2 flex-column">
                     <div class="d-flex align-items-center">
                         <input name="model" type="hidden" value="{{ $usedModel }}">
                         <input name="old_entry_id" id="old_entry_id" type="hidden" value="{{ session('entry') && session('tag') && session('tag') == 'Thoughts' ? session('entry')['id'] : '' }}">
@@ -92,33 +92,48 @@
         <div class="col-12 col-lg-5">
             <div class="d-flex justify-content-between align-items-center">
                 <h2>Tags library</h2>
-                <button type="button" class="btn btn-sm border-0" aria-label="Filter tags" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                         class="bi bi-funnel" viewBox="0 0 16 16">
-                        <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z"/>
-                    </svg>
-                </button>
+                <div class="input-group filter pb-2">
+                    <input type="text" class="form-control rounded-start-3" id="entrySearch" placeholder="Filter" aria-label="Filter entries">
+                    <button class="btn btn-sm rounded-end-3" id="filterBtn" type="button" data-bs-toggle="dropdown" aria-label="Filter tags" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-funnel" viewBox="0 0 16 16">
+                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown">
+                        <ul class="dropdown-menu ps-2">
+                            @foreach($data as $tag => $entries)
+                                <li class="filterTag">
+                                    <div class="form-check">
+                                        <input class="form-check-input filterCheckbox" name="filterCheckbox" type="checkbox" checked>
+                                        <span class="form-check-label">{{ $tag }}</span>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
             </div>
             @foreach($data as $tag => $entries)
-                <div class="tag mb-3">
+                <div class="tag mb-3" id="header-{{ $tag }}">
                     <div class="category-header d-flex justify-content-between align-items-center"
                          data-bs-toggle="collapse" data-bs-target="#{{ $tag }}"
                          aria-expanded="{{ session('tag') === $tag ? 'true' : 'false' }}"
                          aria-label="Toggle {{ $tag }} entries">
                         <div class="d-flex align-items-center">
-                        <span class="arrow me-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                              <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                            </svg>
-                        </span>
-                            {{ $tag }}
+                            <span class="arrow me-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                                  <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                </svg>
+                            </span>
+                            <span class="tagName">{{ $tag }}</span>
                         </div>
                         <span class="badge rounded-pill">{{ count($entries) }}</span>
                     </div>
                     <div id="{{ $tag }}" class="collapse collapse-content fade-smooth mt-2 {{ session('tag') == $tag ? 'show' : '' }}">
                         @foreach($entries as $entry)
-                            <form method="POST" class="tag-{{ $tag }}" action="{{ route('dashboard.destroy') }}">
+                            <form method="POST" class="tag-{{ $tag }} entry" action="{{ route('dashboard.destroy') }}">
                                 @csrf
                                 @method('DELETE')
                                 <div class="item-box mb-2 d-flex gap-3 align-items-center {{ session('tag') == "Thoughts" && optional(session('entry'))['id'] == $entry->id ? "border-primary-subtle" : "" }}">
