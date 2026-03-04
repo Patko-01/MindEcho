@@ -6,12 +6,12 @@
 
             <div class="mb-3 mt-4">
                 <label for="loginPersonEmail" class="form-label">Email</label>
-                <input type="email" value="{{ old('email') }}" name="email" autocomplete="on" class="form-control" id="loginPersonEmail" aria-describedby="personEmailHelp" required>
+                <input type="email" value="{{ old('email') }}" name="email" autocomplete="on" class="form-control" id="loginPersonEmail" aria-describedby="personEmailHelp" placeholder="you@example.com" required>
                 <div class="field-error text-danger small mt-1" data-for="email"></div>
             </div>
             <div class="mb-3">
                 <label for="loginPersonPassword" class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" id="loginPersonPassword" autocomplete="on" aria-describedby="personPasswordHelp" required>
+                <input type="password" name="password" class="form-control" id="loginPersonPassword" autocomplete="on" aria-describedby="personPasswordHelp" placeholder="password123" required>
                 <div class="field-error text-danger small mt-1" data-for="password"></div>
             </div>
 
