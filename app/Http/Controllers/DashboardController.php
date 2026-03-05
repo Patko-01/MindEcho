@@ -99,7 +99,7 @@ class DashboardController extends Controller
         $data = $entries->groupBy('tag');
 
         $models = AiModel::pluck('name');
-        
+
         $usedModel = session('usedModel', $models->first());
 
         return view('pages.dashboard', compact('data', 'models', 'usedModel'));
@@ -119,11 +119,10 @@ class DashboardController extends Controller
 
         if ($data['tag'] != "Thoughts") {
             $entry = Entry::create(['user_id' => $request->user()->id, 'entry_title' => $data['content'], 'tag' => $data['tag']]);
-            Note::create(['entry_id' => $entry->id, 'content' => $data['content']]);
             return redirect()->route('dashboard')
                 ->with('tag', $tag)
                 ->with('usedModel', $model)
-                ->with('entry', $entry->only(['id', 'entry_title', 'content', 'tag']));
+                ->with('entry', $entry->only(['id', 'entry_title', 'tag']));
         }
 
         $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
