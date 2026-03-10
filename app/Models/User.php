@@ -51,11 +51,6 @@ class User extends Authenticatable
         'is_admin' => 'boolean',
     ];
 
-    public function isAdmin(): bool
-    {
-        return $this->is_admin;
-    }
-
     public function entries(): HasMany
     {
         return $this->hasMany(Entry::class);

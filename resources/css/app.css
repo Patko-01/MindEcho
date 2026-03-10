@@ -280,3 +280,29 @@ form .midBtn {
 .submit-on-check {
     cursor: pointer;
 }
+
+#yourMind {
+    display: inline-block; /* allow width animation */
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: bottom;
+    box-sizing: content-box;
+    border-right: 2px solid rgba(0,0,0,0.85); /* caret */
+
+    animation-name: typing;
+    animation-duration: 2.1s;
+    animation-timing-function: steps(21, end);
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; border: none; }
+}
+
+@media (max-width: 520px) {
+    h2 {
+        font-size: 1.3rem;
+    }
+}

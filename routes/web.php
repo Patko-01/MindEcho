@@ -39,5 +39,3 @@ Route::middleware(['auth', 'can:access-admin'])->controller(AdminController::cla
     Route::post('/admin', 'addModel')->name('admin.addModel');
     Route::delete('/admin', 'destroy')->name('admin.destroy');
 });
-
-
