@@ -3,7 +3,7 @@
         <div class="row gap-5">
         <div class="col-12 col-lg-6">
             <div class="d-flex justify-content-between align-items-center">
-                <h2 id="yourMind">What is on your mind?</h2>
+                <h2 id="yourMind"></h2>
                 <div class="dropdown">
                     <a class="btn dropdown-toggle" id="displayed-model" href="#" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">

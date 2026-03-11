@@ -22,7 +22,7 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
         <div class="d-flex align-items-center">
-            <a class="navbar-brand mb-0" href="{{ route('home') }}">Mindecho</a>
+            <a class="navbar-brand mb-0 spreadAnimation" href="{{ route('home') }}">Mindecho</a>
             @auth
                 <div class="d-inline-flex flex-nowrap align-items-center ms-2">
                     <span class="me-2 mb-0">Welcome, {{ auth()->getUser()->name }}!</span>
@@ -42,22 +42,22 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}">Home</a>
+                    <a class="nav-link spreadAnimation" href="{{ route('home') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('about') }}">About us</a>
+                    <a class="nav-link spreadAnimation" href="{{ route('about') }}">About</a>
                 </li>
 
                 @auth
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contact') }}">Contact</a>
+                        <a class="nav-link spreadAnimation" href="{{ route('contact') }}">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                        <a class="nav-link spreadAnimation" href="{{ route('dashboard') }}">Dashboard</a>
                     </li>
                     @can('access-admin')
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin') }}">Admin</a>
+                            <a class="nav-link spreadAnimation" href="{{ route('admin') }}">Admin</a>
                         </li>
                     @endcan
                     <li class="nav-item">
@@ -70,7 +70,7 @@
 
                 @guest
                     <li class="nav-item">
-                        <a class="btn authBtn ms-1" href="{{ route('show.login') }}">Sign in</a>
+                        <a class="btn authBtn ms-1 spreadAnimation" href="{{ route('show.login') }}">Sign in</a>
                     </li>
                 @endguest
             </ul>

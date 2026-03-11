@@ -199,6 +199,25 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 });
 
+//animation
+document.addEventListener('DOMContentLoaded', function () {
+    const h1 = document.getElementById("yourMind");
+    if (h1) {
+        let i = 0;
+        const txt = 'What is on your mind?';
+        const speed = 40;
+
+        function typeWriter() {
+            if (i < txt.length) {
+                h1.innerHTML += txt.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            }
+        }
+        typeWriter();
+    }
+});
+
 // admin model search functionality
 document.addEventListener('DOMContentLoaded', function () {
     const search = document.getElementById('modelSearch');
