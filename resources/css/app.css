@@ -299,3 +299,13 @@ form .midBtn {
     letter-spacing: 0.06em;
     transform: scaleX(1.03);
 }
+
+#carouselExampleSlidesOnly {
+    height: 350px;
+}
+
+@media (max-width: 768px) {
+    #carouselExampleSlidesOnly {
+        height: calc(350px * 3);
+    }
+}

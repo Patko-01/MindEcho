@@ -7,7 +7,8 @@
 
             @guest
                 <a href="{{ route('show.login') }}" class="btn btnStart btn-lg d-inline-flex align-items-center">
-                    Get started<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-arrow-right-short ms-2" viewBox="0 0 16 16" aria-hidden="true">
+                    Get started
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-arrow-right-short ms-2" viewBox="0 0 16 16" aria-hidden="true">
                         <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
                     </svg>
                 </a>
@@ -34,36 +35,110 @@
 
     <div class="container second p-5">
         <h1>About MindEcho - Your Daily Companion</h1>
-        <div class="row about-section">
-            <div class="col-md-4 mb-5">
-                <h5>Manage Stress Effectively</h5>
-                <p class="heading-text lead">
-                    Writing down your thoughts helps release mental tension and reduces
-                    the weight of daily stress. By journaling regularly, you create a
-                    safe space to process emotions and find calm amidst the chaos of
-                    everyday life.
-                </p>
-                <img src="{{ Vite::asset('resources/assets/icon1.png') }}" class="about-icon" alt="icon">
-            </div>
-            <div class="col-md-4 mb-5">
-                <h5>Keep Your Thoughts Nearby</h5>
-                <p class="heading-text lead">
-                    Capture fleeting ideas and meaningful reflections before they slip
-                    away. MindEcho keeps your entries organized and accessible, so you
-                    can revisit past insights and track your personal growth over time
-                    whenever you need.
-                </p>
-                <img src="{{ Vite::asset('resources/assets/icon2.png') }}" class="about-icon" alt="icon">
-            </div>
-            <div class="col-md-4 mb-5">
-                <h5>Brainstorm Your Ideas</h5>
-                <p class="heading-text lead">
-                    Transform scattered thoughts into actionable plans. Use your journal
-                    as a creative playground to explore new concepts, solve problems, and
-                    develop ideas without judgment. Your best breakthroughs often start
-                    with a simple note.
-                </p>
-                <img src="{{ Vite::asset('resources/assets/icon3.png') }}" class="about-icon" alt="icon">
+        <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel" data-bs-interval="10000">
+            <div class="carousel-inner">
+                <div class="carousel-item">
+                    <div class="row about-section">
+                        <div class="col-md-4 mb-5">
+                            <h5>Manage Stress Effectively</h5>
+                            <p class="heading-text lead">
+                                Writing down your thoughts helps release mental tension and reduces
+                                the weight of daily stress. By journaling regularly, you create a
+                                safe space to process emotions and find calm amidst the chaos of
+                                everyday life.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon1.png') }}" class="about-icon" alt="icon">
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <h5>Keep Your Thoughts Nearby</h5>
+                            <p class="heading-text lead">
+                                Capture fleeting ideas and meaningful reflections before they slip
+                                away. MindEcho keeps your entries organized and accessible, so you
+                                can revisit past insights and track your personal growth over time
+                                whenever you need.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon2.png') }}" class="about-icon" alt="icon">
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <h5>Brainstorm Your Ideas</h5>
+                            <p class="heading-text lead">
+                                Transform scattered thoughts into actionable plans. Use your journal
+                                as a creative playground to explore new concepts, solve problems, and
+                                develop ideas without judgment. Your best breakthroughs often start
+                                with a simple note.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon3.png') }}" class="about-icon" alt="icon">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item active">
+                    <div class="row about-section">
+                        <div class="col-md-4 mb-5">
+                            <h5>Stay Consistent</h5>
+                            <p class="heading-text lead">
+                                Small, regular check-ins build lasting habits. Make a quick
+                                entry each day to develop a dependable journaling routine
+                                that supports wellbeing and growth over time. Even brief notes
+                                compound into meaningful records that reveal trends and triggers.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon4.png') }}" class="about-icon" alt="icon">
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <h5>Private by Design</h5>
+                            <p class="heading-text lead">
+                                Your thoughts stay yours. MindEcho is built with privacy in
+                                mind so you can write openly without worrying about who can
+                                see or use your entries. We focus on keeping your data secure
+                                so you can be honest and intentional in your reflections.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon5.png') }}" class="about-icon" alt="icon">
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <h5>Track Your Progress</h5>
+                            <p class="heading-text lead">
+                                Revisit past entries to spot patterns, celebrate progress, and
+                                notice what helps you feel your best. Reflection fuels change.
+                                Looking back regularly helps you set more realistic goals and
+                                recognize the small wins that often go unnoticed.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon6.png') }}" class="about-icon" alt="icon">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row about-section">
+                        <div class="col-md-4 mb-5">
+                            <h5>Set Clear Goals</h5>
+                            <p class="heading-text lead">
+                                Break big ideas into actionable steps. Use your journal to
+                                set, review, and refine goals so progress becomes intentional
+                                and visible. Writing down concrete next steps makes it easier
+                                to commit and follow through when motivation fluctuates.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon7.png') }}" class="about-icon" alt="icon">
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <h5>Reflect Daily</h5>
+                            <p class="heading-text lead">
+                                A brief reflection each day helps you learn from experience,
+                                calm your mind, and make better choices tomorrow than you did
+                                today. These short practices build resilience by turning
+                                observations into useful lessons over time.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon8.png') }}" class="about-icon" alt="icon">
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <h5>Celebrate Wins</h5>
+                            <p class="heading-text lead">
+                                Notice progress, however small. Logging wins encourages
+                                momentum and builds a positive record of your efforts. When you
+                                review these moments, it becomes easier to stay motivated and
+                                focused on what matters most.
+                            </p>
+                            <img src="{{ Vite::asset('resources/assets/icon9.png') }}" class="about-icon" alt="icon">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
