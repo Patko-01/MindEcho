@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('ai_models', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
             $table->string('name');
             $table->string('description')->nullable();
+            $table->string('status');
+            $table->timestamps();
         });
     }
 

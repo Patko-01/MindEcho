@@ -57,7 +57,7 @@ class DashboardController extends Controller
 
     private function generateTitle(string $content, string $ollamaHost): string
     {
-        $firstModel = AiModel::orderBy('id')->firstOrFail();
+        $firstModel = AiModel::where('status', 'ready')->orderBy('id')->firstOrFail();
 
         try {
             $response = Http::timeout(0)->post($ollamaHost . '/api/generate', [
@@ -98,7 +98,7 @@ class DashboardController extends Controller
         $entries = Entry::where('user_id', $user->id)->latest()->get();
         $data = $entries->groupBy('tag');
 
-        $models = AiModel::pluck('name');
+        $models = AiModel::where('status', 'ready')->pluck('name');
 
         $usedModel = session('usedModel', $models->first());
 

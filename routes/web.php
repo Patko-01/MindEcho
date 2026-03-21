@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Models\AiModel;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(HomeController::class)->group(function () {
@@ -38,4 +39,6 @@ Route::middleware(['auth', 'can:access-admin'])->controller(AdminController::cla
     Route::get('/admin', 'index')->name('admin');
     Route::post('/admin', 'addModel')->name('admin.addModel');
     Route::delete('/admin', 'destroy')->name('admin.destroy');
+
+    Route::get('/statuses', 'getStatuses');
 });

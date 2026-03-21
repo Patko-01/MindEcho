@@ -32,7 +32,19 @@
             @foreach($models as $model)
                 <li class="list-group-item model p-3 border-1 d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="item-text">{{ $model->name }}</span><br>
+                        <span class="item-text">{{ $model->name }}</span>
+                        @php
+                            $statusClasses = [
+                                'ready' => 'success',
+                                'processing' => 'info',
+                                'failed' => 'danger',
+                            ];
+                        @endphp
+                        @if(isset($statusClasses[$model->status]))
+                            <span class="badge rounded-pill text-bg-{{ $statusClasses[$model->status] }} fw-medium">
+                                {{ $model->status }}
+                            </span><br>
+                        @endif
                         <small class="text-muted">{{ $model->description }}</small>
                     </div>
                     <form class="m-0 model-delete-form" action="{{ route('admin.destroy') }}" method="POST">

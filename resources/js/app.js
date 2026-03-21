@@ -243,6 +243,58 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// admin statuses fetch
+document.addEventListener('DOMContentLoaded', function () {
+    function fetchStatuses() {
+        fetch('/statuses')
+            .then(response => response.json())
+            .then(data => {
+                if (data.name !== '') {
+                    // Create the alert div
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-' + (data.status === 'ready' ? 'success' : 'danger') +  ' alert-dismissible fade show text-center';
+                    alertDiv.setAttribute('role', 'alert');
+                    alertDiv.innerText = "Model " + data.name + " finished pulling with status: " + data.status;
+
+                    // Create the close button
+                    const closeButton = document.createElement('button');
+                    closeButton.type = 'button';
+                    closeButton.className = 'btn-close';
+                    closeButton.setAttribute('data-bs-dismiss', 'alert');
+                    closeButton.setAttribute('aria-label', 'Close');
+
+                    // Append the button to the alert div
+                    alertDiv.appendChild(closeButton);
+
+                    // Insert the alert as the first child of <body>
+                    document.body.insertBefore(alertDiv, document.body.firstChild);
+                }
+            })
+            .catch(error => console.error(error));
+    }
+
+    let interval;
+
+    function startPolling() {
+        interval = setInterval(fetchStatuses, 3000);
+    }
+
+    function stopPolling() {
+        clearInterval(interval);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            startPolling();
+        }
+    });
+
+    fetchStatuses();
+    startPolling();
+});
+
 // admin users search functionality
 document.addEventListener('DOMContentLoaded', function () {
     const searchUser = document.getElementById('userSearch');

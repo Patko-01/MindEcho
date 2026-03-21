@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Jobs\PullModelJob;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Cache;
 
 class AdminController extends Controller
 {
@@ -22,6 +23,28 @@ class AdminController extends Controller
         return view('pages.admin')->with('models', $models)->with('users', $users);
     }
 
+    public function getStatuses()
+    {
+        $oldIds = Cache::get('oldModelIds', []);
+        $currentIds = AiModel::whereIn('status', ['ready', 'failed'])->pluck('id');
+
+        if (empty($oldIds)) {
+            Cache::put('oldModelIds', $currentIds);
+            return response()->json(['name' => '']);
+        }
+
+        $newModel = AiModel::whereIn('id', $currentIds)
+            ->whereNotIn('id', $oldIds)
+            ->first();
+
+        Cache::put('oldModelIds', $currentIds);
+
+        return response()->json([
+            'name' => $newModel?->name ?? '',
+            'status' => $newModel?->status ?? ''
+        ]);
+    }
+
     public function addModel(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -29,7 +52,15 @@ class AdminController extends Controller
             'modelDescription' => 'required|string|max:255',
         ]);
 
-        PullModelJob::dispatch($data['modelName'], $data['modelDescription']);
+        $aiModel = AiModel::updateOrCreate(
+            ['name' => $data['modelName']],
+            [
+                'description' => $data['modelDescription'],
+                'status' => 'processing',
+            ]
+        );
+
+        PullModelJob::dispatch($aiModel->id);
 
         return redirect()->route('admin')->with('success', 'Model pull queued. It will be added once downloaded.');
     }
@@ -41,6 +72,11 @@ class AdminController extends Controller
         ]);
 
         $model = AiModel::findOrFail($data['modelId']);
+
+        if ($model->status == 'failed') {
+            $model->delete();
+            return redirect()->route('admin')->with('success', 'Model deleted successfully.');
+        }
 
         $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
         try {

@@ -11,55 +11,57 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
+use Throwable;
 
 class PullModelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected string $modelName;
-    protected string $modelDescription;
+    protected int $modelId;
 
-    public function __construct(string $modelName, string $modelDescription)
+    public function __construct(int $modelId)
     {
-        $this->modelName = $modelName;
-        $this->modelDescription = $modelDescription;
+        $this->modelId = $modelId;
     }
 
     /**
+     * @throws Throwable
      * @throws ConnectionException
      */
     public function handle(): void
     {
+        $aiModel = AiModel::findOrFail($this->modelId);
+
         $ollamaHost = config('services.ollama.host', 'http://127.0.0.1:11434');
 
-        $response = Http::timeout(0)->post($ollamaHost . '/api/pull', [
-            'name' => $this->modelName,
-        ]);
+        try {
+            $response = Http::timeout(0)->post($ollamaHost . '/api/pull', [
+                'name' => $aiModel->name,
+            ]);
 
-        if ($response->failed()) {
-            throw new RuntimeException("Ollama pull failed with status " . $response->status());
+            if ($response->failed()) {
+                $aiModel->update(['status' => 'failed']);
+                throw new RuntimeException("Ollama pull failed with status " . $response->status());
+            }
+
+            $lines = explode("\n", trim($response->body()));
+
+            foreach ($lines as $line) {
+                if ($line === '') continue;
+
+                $json = json_decode($line, true);
+                if (!is_array($json)) continue;
+
+                if (isset($json['error'])) {
+                    $aiModel->update(['status' => 'failed']);
+                    throw new RuntimeException("Ollama pull failed: " . $json['error']);
+                }
+            }
+
+            $aiModel->update(['status' => 'ready']);
+        } catch (Throwable $e) {
+            $aiModel->update(['status' => 'failed']);
+            throw $e;
         }
-
-        $lines = explode("\n", trim($response->body()));
-
-        foreach ($lines as $line) {
-            if ($line === '') {
-                continue;
-            }
-
-            $json = json_decode($line, true);
-            if (!is_array($json)) {
-                continue;
-            }
-
-            if (isset($json['error'])) {
-                throw new RuntimeException("Ollama pull failed " . $json['error']);
-            }
-        }
-
-        AiModel::firstOrCreate(
-            ['name' => $this->modelName],
-            ['description' => $this->modelDescription]
-        );
     }
 }
