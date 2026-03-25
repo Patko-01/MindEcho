@@ -27,6 +27,7 @@ class DashboardController extends Controller
         foreach ($notes as $i => $note) {
             $conversation->push([
                 'note' => $note->content,
+                'date' => $note->created_at,
                 'model_name' => $responses[$i]->model_name ?? null,
                 'response' => $responses[$i]->content ?? null,
             ]);
@@ -96,13 +97,13 @@ class DashboardController extends Controller
         $user = $request->user();
 
         $entries = Entry::where('user_id', $user->id)->latest()->get();
-        $data = $entries->groupBy('tag');
+        $dataGrouped = $entries->groupBy('tag');
 
         $models = AiModel::where('status', 'ready')->pluck('name');
 
         $usedModel = session('usedModel', $models->first());
 
-        return view('pages.dashboard', compact('data', 'models', 'usedModel'));
+        return view('pages.dashboard', compact('dataGrouped', 'models', 'usedModel'));
     }
 
     public function newEntry(Request $request): RedirectResponse
@@ -160,6 +161,8 @@ class DashboardController extends Controller
 
         Note::create(['entry_id' => $entry->id, 'content' => $data['content']]);
         Response::create(['entry_id' => $entry->id, 'model_name' => $model,'content' => $question]);
+
+        $entry->touch();
 
         $payload = [
             'id' => $entry->id,

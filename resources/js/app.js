@@ -21,8 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function resize() {
             textarea.style.height = 'auto';
-            const taHeight = textarea.scrollHeight;
-            textarea.style.height = taHeight + 'px';
+            textarea.style.height = textarea.scrollHeight + 'px';
         }
 
         function saveTag() {
