@@ -17,6 +17,48 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const rangeInput = document.getElementById('rangeTemperature');
+        const rangeOutput = document.getElementById('spanForTemperature');
+
+        if (!rangeInput || !rangeOutput) {
+            return;
+        }
+
+        function getTemperatureColor(val) {
+            if (val < 0.2) {
+                return "bg-primary";
+            }
+            if (val < 0.4) {
+                return "bg-info";
+            }
+            if (val < 0.6) {
+                return "bg-success";
+            }
+            if (val < 0.85) {
+                return "bg-warning";
+            }
+
+            return "bg-danger";
+        }
+
+        // initial setup
+        rangeOutput.textContent = rangeInput.value;
+        rangeOutput.classList.add(getTemperatureColor(Number(rangeInput.value)));
+
+        rangeInput.addEventListener('input', function() {
+            rangeOutput.textContent = this.value;
+
+            rangeOutput.classList.remove(
+                "bg-primary",
+                "bg-info",
+                "bg-success",
+                "bg-warning",
+                "bg-danger"
+            );
+
+            rangeOutput.classList.add(getTemperatureColor(Number(this.value)));
+        });
+
         textarea.focus();
 
         function resize() {

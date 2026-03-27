@@ -85,7 +85,7 @@ class DashboardController extends Controller
         - Casual comments or jokes
 
         Your task:
-        - Ask ONE thoughtful, open-ended question about the user’s feelings, values, or experiences.
+        - Ask ONE thoughtful, open-ended question about the user’s feelings, values, or experiences. You may vary your style and tone.
         - If the user writes something unrelated or playful, you may lightly acknowledge it in the question, but continue reflecting.
         - Do NOT give advice, explanations, or instructions.
         - Output ONLY the question.
@@ -112,6 +112,7 @@ class DashboardController extends Controller
             'content' => 'required|string',
             'tag' => 'required|string',
             'model' => 'required|string|exists:ai_models,name',
+            'temperature' => 'required|numeric|between:0,1',
             'old_entry_id' => 'nullable|integer|exists:entries,id',
         ]);
 
@@ -149,7 +150,17 @@ class DashboardController extends Controller
                 'system' => $this->systemPrompt(),
                 'prompt' => $prompt,
                 'stream' => false,
+                'options' => [
+                    'temperature' => (float) $data['temperature'],
+                ],
             ]);
+
+            if (!$ollamaResponse->successful()) {
+                return redirect()->route('dashboard')
+                    ->with('tag', $tag)
+                    ->with('usedModel', $model)
+                    ->with('error', 'Ollama error: ' . $ollamaResponse->body());
+            }
         } catch (ConnectionException $e) {
             return redirect()->route('dashboard')
                 ->with('tag', $tag)

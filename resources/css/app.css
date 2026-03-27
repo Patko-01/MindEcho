@@ -309,3 +309,15 @@ form .midBtn {
         height: calc(350px * 3);
     }
 }
+
+#temperatureButton {
+    margin-top: 3px;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    transition: transform 500ms;
+}
+
+#temperatureButton:hover {
+    transform: rotate(180deg);
+}
