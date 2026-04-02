@@ -61,6 +61,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         textarea.focus();
 
+        const firstSpanIcon = document.getElementById("firstSpanIcon");
+        const secondSpanIcon = document.getElementById("secondSpanIcon");
+        const sortBtn = document.getElementById("sortBtn");
+        const hideSortBtn = document.getElementById("hideSortBtn");
+        const allEntriesContainer = document.getElementById("allEntriesContainer");
+
+        if (firstSpanIcon && secondSpanIcon && sortBtn && hideSortBtn && allEntriesContainer) {
+            firstSpanIcon.style.display = "none";
+            let sortDesc = true;
+
+            window.originalParents = new Map();
+
+            document.querySelectorAll('.entry').forEach(entry => {
+                window.originalParents.set(entry, entry.parentNode);
+            });
+
+            sortBtn.addEventListener("click", function () {
+                sortDesc = !sortDesc;
+
+                hideSortBtn.classList.remove('visually-hidden');
+
+                const allEntries = Array.from(document.querySelectorAll('.entry'));
+
+                allEntries.sort((a, b) => {
+                    const dateA = new Date(a.querySelector('.item-date').dataset.date);
+                    const dateB = new Date(b.querySelector('.item-date').dataset.date);
+
+                    return sortDesc ? dateB - dateA : dateA - dateB;
+                });
+
+                allEntriesContainer.innerHTML = '';
+                allEntries.forEach(el => allEntriesContainer.appendChild(el));
+
+                document.querySelectorAll('.tag').forEach(tag => tag.style.display = 'none');
+
+                firstSpanIcon.style.display = sortDesc ? 'none' : '';
+                secondSpanIcon.style.display = sortDesc ? '' : 'none';
+            });
+
+            hideSortBtn.addEventListener("click", function () {
+                originalParents.forEach((parent, entry) => {
+                    parent.appendChild(entry);
+                });
+
+                allEntriesContainer.innerHTML = '';
+
+                document.querySelectorAll('.tag').forEach(tag => tag.style.display = '');
+
+                hideSortBtn.classList.add('visually-hidden');
+
+                firstSpanIcon.style.display = 'none';
+                secondSpanIcon.style.display = '';
+            });
+        }
+
         function resize() {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
@@ -168,67 +223,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     if (res.ok) {
-                        const removableForm = document.getElementById("removableForm");
-                        let section = closestForm.closest('.tag');
-                        let tagNameText = '';
+                        const entryId = closestForm.querySelector('input[name="entry_id"]').value;
+                        const tagClass = Array.from(closestForm.classList).find(c => c.startsWith('tag-'));
+                        let tagName;
 
-                        if (section) {
-                            const tagSpan = section.querySelector('.tagName');
-                            tagNameText = tagSpan ? tagSpan.textContent.trim() : '';
+                        if (tagClass) {
+                            tagName = tagClass.substring(4);
                         }
 
-                        if (removableForm) {
-                            const entryId = closestForm.querySelector('input[name="entry_id"]').value;
-                            if (removableForm === closestForm) { // remove the display message only if the checkbox inside display message was clicked
-                                removableForm.remove();
-                                document.getElementById("old_entry_id").value = '';
+                        if (tagName) {
+                            const section = document.getElementById('header-' + tagName);
+                            if (section) {
+                                const badge = section.querySelector('.badge.rounded-pill');
+                                if (badge) {
+                                    const currentCount = parseInt(badge.textContent, 10) || 0;
+                                    const newCount = Math.max(0, currentCount - 1);
+                                    badge.textContent = "" + newCount;
 
-                                const forms = document.querySelectorAll('.tag-Thoughts');
-                                let targetForm = null;
-
-                                forms.forEach(form => {
-                                    const input = form.querySelector('input[name="entry_id"]');
-                                    if (input) {
-                                        if (input.value === entryId) {
-                                            targetForm = form;
-                                        }
-                                    }
-                                });
-
-                                if (targetForm) {
-                                    section = targetForm.closest('.tag');
-                                    targetForm.remove();
-                                }
-                            } else {
-                                if (entryId && removableForm.querySelector('input[name="entry_id"]').value === entryId) {
-                                    removableForm.remove();
-                                    document.getElementById("old_entry_id").value = '';
-                                }
-                            }
-                        }
-
-                        if (closestForm) {
-                            closestForm.remove();
-                        }
-                        if (section) {
-                            const badge = section.querySelector('.badge.rounded-pill');
-                            if (badge) {
-                                const remainingItems = section.querySelectorAll('.item-box').length;
-                                if (remainingItems === 0) {
-                                    section.remove();
-                                    if (tagNameText) {
+                                    if (newCount === 0) {
+                                        section.remove();
                                         const filterTags = Array.from(document.getElementsByClassName('filterTag'));
                                         filterTags.forEach(li => {
                                             const label = li.querySelector('.form-check-label');
-                                            if (label && label.textContent.trim() === tagNameText) {
+                                            if (label && label.textContent.trim() === tagName) {
                                                 li.remove();
                                             }
                                         });
                                     }
                                 }
-                                badge.textContent = remainingItems;
                             }
                         }
+
+                        document.querySelectorAll('form').forEach(form => {
+                            const input = form.querySelector('input[name="entry_id"]');
+                            if (input && input.value === entryId) {
+                                if (window.originalParents && window.originalParents.has(form)) {
+                                    window.originalParents.delete(form);
+                                }
+                                form.remove();
+                            }
+                        });
+
+                        const oldEntryIdInput = document.getElementById("old_entry_id");
+                        if (oldEntryIdInput && oldEntryIdInput.value === entryId) {
+                            oldEntryIdInput.value = '';
+                        }
+
                     } else if (res.status === 422) {
                         console.error('Validation failed');
                     }

@@ -96,7 +96,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $entries = Entry::where('user_id', $user->id)->latest()->get();
+        $entries = Entry::where('user_id', $user->id)->latest('updated_at')->get();
         $dataGrouped = $entries->groupBy('tag');
 
         $models = AiModel::where('status', 'ready')->pluck('name');

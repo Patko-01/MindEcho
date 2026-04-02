@@ -204,9 +204,22 @@ form .midBtn {
     width: 14rem;
 }
 
-#filterBtn {
+#hideSortBtn {
+    height: 38px;
+    right: -2.5rem;
+}
+
+#hideSortBtn svg {
+    padding-left: 1px;
+    padding-bottom: 1px;
+}
+
+.borderBtn {
     border: 1px solid rgb(222, 226, 230);
-    border-left: none;
+}
+
+.borderBtn:hover {
+    border: 1px solid rgb(222, 226, 230);
 }
 
 #dashboard-input {
