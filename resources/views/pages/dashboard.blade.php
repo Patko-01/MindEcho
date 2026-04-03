@@ -25,7 +25,7 @@
                 @php $newEntry = session('entry'); @endphp
                 @if ($newEntry && $newEntry['tag'] == "Thoughts")
                     <div class="mt-3 mb-3">
-                        <form method="POST" id="removableForm" action="{{ route('dashboard.destroy') }}">
+                        <form method="POST" id="removableForm" action="{{ route('dashboard.delete') }}">
                             @csrf
                             @method('DELETE')
                             <div class="item-box d-inline-flex gap-2 align-items-center p-2">
@@ -227,11 +227,10 @@
                              class="collapse collapse-content fade-smooth mt-2 {{ session('tag') == $tag ? 'show' : '' }}">
                             @foreach($entries as $entry)
                                 <form method="POST" class="tag-{{ $tag }} entry"
-                                      action="{{ route('dashboard.destroy') }}">
+                                      action="{{ route('dashboard.delete') }}">
                                     @csrf
                                     @method('DELETE')
-                                    <div
-                                        class="item-box mb-2 d-flex gap-3 align-items-center {{ session('tag') == "Thoughts" && optional(session('entry'))['id'] == $entry->id ? "border-primary-subtle" : "" }}">
+                                    <div class="item-box mb-2 d-flex gap-3 align-items-center {{ session('tag') == "Thoughts" && optional(session('entry'))['id'] == $entry->id ? "border-primary-subtle" : "" }}">
                                         <input name="entry_id" value="{{ $entry->id }}"
                                                class="form-check-input mt-0 submit-on-check" type="checkbox"
                                                aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
@@ -251,6 +250,32 @@
                         </div>
                     </div>
                 @endforeach
+                <p class="text-center text-muted {{ count($deletedEntries) > 0 ? '' : 'visually-hidden' }}" id="deletedEntriesLine">deleted</p>
+                <div id="divWithDeletedEntries" data-destroy-url="{{ route('dashboard.destroy') }}">
+                    @foreach($deletedEntries as $entry)
+                        <form method="POST" action="{{ route('dashboard.destroy') }}">
+                            @csrf
+                            @method('DELETE')
+                            <div class="item-box mb-2 d-flex gap-3 align-items-center bg-secondary-subtle">
+                                <input name="entry_id" value="{{ $entry->id }}"
+                                       class="form-check-input mt-0 submit-on-check" type="checkbox"
+                                       aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
+                                <div class="flex-grow-1">
+                                <span class="d-block">
+                                    <span class="item-text d-block">{{ $entry->entry_title }}</span>
+                                    <span class="item-date d-block">{{ Carbon::parse($entry->updated_at)->diffForHumans() }}</span>
+                                </span>
+                                </div>
+                                @if($entry->tag == 'Thoughts')
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor" class="bi bi-anthropic" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M9.218 2h2.402L16 12.987h-2.402zM4.379 2h2.512l4.38 10.987H8.82l-.895-2.308h-4.58l-.896 2.307H0L4.38 2.001zm2.755 6.64L5.635 4.777 4.137 8.64z"/>
+                                    </svg>
+                                @endif
+                            </div>
+                        </form>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>

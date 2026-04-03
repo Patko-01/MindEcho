@@ -6,13 +6,14 @@ use App\Models\Entry;
 use App\Models\AiModel;
 use App\Models\Note;
 use App\Models\Response;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Http\Client\ConnectionException;
 use Throwable;
 
@@ -96,14 +97,16 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $entries = Entry::where('user_id', $user->id)->latest('updated_at')->get();
+        $entries = Entry::where('user_id', $user->id)->where('is_deleted', false)->latest('updated_at')->get();
         $dataGrouped = $entries->groupBy('tag');
+
+        $deletedEntries = Entry::where('user_id', $user->id)->latest('updated_at')->where('is_deleted', true)->get();
 
         $models = AiModel::where('status', 'ready')->pluck('name');
 
         $usedModel = session('usedModel', $models->first());
 
-        return view('pages.dashboard', compact('dataGrouped', 'models', 'usedModel'));
+        return view('pages.dashboard', compact('dataGrouped', 'models', 'usedModel', 'deletedEntries'));
     }
 
     public function newEntry(Request $request): RedirectResponse
@@ -211,7 +214,25 @@ class DashboardController extends Controller
             ->with('entry', $payload);
     }
 
-    public function destroy(Request $request): HttpResponse
+    public function delete(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'entry_id' => 'required|integer|exists:entries,id',
+        ]);
+
+        $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
+
+        $entry->update(['is_deleted' => true]);
+
+        return response()->json([
+            'id' => $entry->id,
+            'title' => $entry->entry_title,
+            'dateTime' => Carbon::parse($entry->updated_at)->diffForHumans(),
+            'tag' => $entry->tag,
+        ]);
+    }
+
+    public function destroy(Request $request): JsonResponse
     {
         $data = $request->validate([
             'entry_id' => 'required|integer|exists:entries,id',
@@ -221,6 +242,6 @@ class DashboardController extends Controller
 
         $entry->delete();
 
-        return response()->noContent();
+        return response()->json();
     }
 }

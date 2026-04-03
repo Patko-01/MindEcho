@@ -30,7 +30,8 @@ Route::middleware('guest')->controller(AuthController::class)->group(function ()
 
 Route::middleware('auth')->controller(DashboardController::class)->group(function () {
     Route::post('/dashboard', 'newEntry')->name('dashboard.newEntry');
-    Route::delete('/dashboard', 'destroy')->name('dashboard.destroy');
+    Route::delete('/dashboard/destroy', 'destroy')->name('dashboard.destroy');
+    Route::delete('/dashboard', 'delete')->name('dashboard.delete');
     Route::get('/dashboard', 'index')->name('dashboard');
     Route::get('/dashboard/entry', 'showEntry')->name('dashboard.showEntry');
 });

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Entry extends Model
 {
-    protected $fillable = ['user_id', 'entry_title', 'tag'];
+    protected $fillable = ['user_id', 'entry_title', 'tag', 'is_deleted'];
 
     public function user(): BelongsTo
     {

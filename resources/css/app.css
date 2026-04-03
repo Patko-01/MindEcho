@@ -334,3 +334,16 @@ form .midBtn {
 #temperatureButton:hover {
     transform: rotate(180deg);
 }
+
+#deletedEntriesLine {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+#deletedEntriesLine:before,
+#deletedEntriesLine:after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+}

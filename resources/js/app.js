@@ -197,85 +197,138 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        document.querySelectorAll('.submit-on-check').forEach(checkbox => {
-            checkbox.addEventListener('change', async function () {
-                const closestForm = this.closest('form');
-                if (!closestForm) {
-                    return;
-                }
+        const divWithDeletedEntries = document.getElementById("divWithDeletedEntries");
+        if (!divWithDeletedEntries) {
+            return;
+        }
 
-                const payload = {
-                    entry_id: this.value
-                };
+        const destroyUrl = divWithDeletedEntries.dataset.destroyUrl;
 
-                const token = getCsrfToken(closestForm);
+        function checkDivWithDeletedEntries() {
+            if (!divWithDeletedEntries.querySelector('form')) {
+                document.getElementById("deletedEntriesLine").classList.add("visually-hidden");
+            } else {
+                document.getElementById("deletedEntriesLine").classList.remove("visually-hidden");
+            }
+        }
 
-                try {
-                    const res = await fetch(closestForm.action, {
-                        method: 'DELETE',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(payload)
+        document.addEventListener('change', async function (e) {
+           if (!e.target.classList.contains('submit-on-check')) {
+               return;
+           }
+
+           const checkbox = e.target;
+           const closestForm = checkbox.closest('form');
+
+           if (!closestForm) {
+               return;
+           }
+
+            const payload = {
+                entry_id: checkbox.value
+            };
+
+            const token = getCsrfToken(closestForm);
+
+            try {
+                const res = await fetch(closestForm.action, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const entryId = checkbox.value;
+                    const tagClass = Array.from(closestForm.classList).find(c => c.startsWith('tag-'));
+                    let tagName;
+
+                    if (tagClass) {
+                        tagName = tagClass.substring(4);
+                    } else {
+                        tagName = "Thoughts";
+                    }
+
+                    if (tagName) {
+                        const section = document.getElementById('header-' + tagName);
+                        if (section) {
+                            const badge = section.querySelector('.badge.rounded-pill');
+                            if (badge) {
+                                const currentCount = parseInt(badge.textContent, 10) || 0;
+                                const newCount = Math.max(0, currentCount - 1);
+                                badge.textContent = "" + newCount;
+
+                                if (newCount === 0) {
+                                    section.remove();
+                                    const filterTags = Array.from(document.getElementsByClassName('filterTag'));
+                                    filterTags.forEach(li => {
+                                        const label = li.querySelector('.form-check-label');
+                                        if (label && label.textContent.trim() === tagName) {
+                                            li.remove();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    document.querySelectorAll('form').forEach(form => {
+                        const input = form.querySelector('input[name="entry_id"]');
+                        if (input && input.value === entryId) {
+                            if (window.originalParents && window.originalParents.has(form)) {
+                                window.originalParents.delete(form);
+                            }
+
+                            form.remove();
+                        }
                     });
 
-                    if (res.ok) {
-                        const entryId = closestForm.querySelector('input[name="entry_id"]').value;
-                        const tagClass = Array.from(closestForm.classList).find(c => c.startsWith('tag-'));
-                        let tagName;
-
-                        if (tagClass) {
-                            tagName = tagClass.substring(4);
-                        }
-
-                        if (tagName) {
-                            const section = document.getElementById('header-' + tagName);
-                            if (section) {
-                                const badge = section.querySelector('.badge.rounded-pill');
-                                if (badge) {
-                                    const currentCount = parseInt(badge.textContent, 10) || 0;
-                                    const newCount = Math.max(0, currentCount - 1);
-                                    badge.textContent = "" + newCount;
-
-                                    if (newCount === 0) {
-                                        section.remove();
-                                        const filterTags = Array.from(document.getElementsByClassName('filterTag'));
-                                        filterTags.forEach(li => {
-                                            const label = li.querySelector('.form-check-label');
-                                            if (label && label.textContent.trim() === tagName) {
-                                                li.remove();
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-
-                        document.querySelectorAll('form').forEach(form => {
-                            const input = form.querySelector('input[name="entry_id"]');
-                            if (input && input.value === entryId) {
-                                if (window.originalParents && window.originalParents.has(form)) {
-                                    window.originalParents.delete(form);
-                                }
-                                form.remove();
-                            }
-                        });
-
-                        const oldEntryIdInput = document.getElementById("old_entry_id");
-                        if (oldEntryIdInput && oldEntryIdInput.value === entryId) {
-                            oldEntryIdInput.value = '';
-                        }
-
-                    } else if (res.status === 422) {
-                        console.error('Validation failed');
+                    const oldEntryIdInput = document.getElementById("old_entry_id");
+                    if (oldEntryIdInput && oldEntryIdInput.value === entryId) {
+                        oldEntryIdInput.value = '';
                     }
-                } catch (err) {
-                    console.error('Delete request failed', err);
+
+                    if (Object.keys(data).length !== 0) {
+                        const newForm = document.createElement('form');
+                        newForm.method = 'POST';
+                        newForm.action = destroyUrl;
+
+                        newForm.innerHTML = `
+                                <input type="hidden" name="_token" value="${token}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <div class="item-box mb-2 d-flex gap-3 align-items-center bg-secondary-subtle">
+                                    <input name="entry_id" value="${data.id}"
+                                           class="form-check-input mt-0 submit-on-check"
+                                           type="checkbox">
+                                    <div class="flex-grow-1">
+                                        <span class="d-block">
+                                            <span class="item-text d-block">${data.title}</span>
+                                            <span class="item-date d-block">${data.dateTime}</span>
+                                        </span>
+                                    </div>
+                                    ${data.tag === 'Thoughts' ? `
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor" class="bi bi-anthropic" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M9.218 2h2.402L16 12.987h-2.402zM4.379 2h2.512l4.38 10.987H8.82l-.895-2.308h-4.58l-.896 2.307H0L4.38 2.001zm2.755 6.64L5.635 4.777 4.137 8.64z"/>
+                                        </svg>
+                                    ` : ''}
+                                </div>
+                            `;
+                        divWithDeletedEntries.appendChild(newForm);
+                    }
+
+                    checkDivWithDeletedEntries();
+                } else if (res.status === 422) {
+                    console.error('Validation failed');
                 }
-            });
+            } catch (err) {
+                console.error('Delete request failed', err);
+            }
         });
     })();
 });
