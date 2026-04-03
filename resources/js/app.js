@@ -203,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const destroyUrl = divWithDeletedEntries.dataset.destroyUrl;
+        const restoreUrl = divWithDeletedEntries.dataset.restoreUrl;
 
         function checkDivWithDeletedEntries() {
             if (!divWithDeletedEntries.querySelector('form')) {
@@ -306,10 +307,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                            class="form-check-input mt-0 submit-on-check"
                                            type="checkbox">
                                     <div class="flex-grow-1">
-                                        <span class="d-block">
-                                            <span class="item-text d-block">${data.title}</span>
-                                            <span class="item-date d-block">${data.dateTime}</span>
-                                        </span>
+                                        <a href="${restoreUrl}?entry_id=${data.id}"
+                                            class="btn btn-link w-100 text-start p-0 text-decoration-none text-body"
+                                            aria-label="Restore entry: ${data.title}">
+                                            <span class="d-block">
+                                                <span class="item-text d-block">${data.title}</span>
+                                                <span class="item-date d-block">${data.dateTime}</span>
+                                            </span>
+                                        </a>
                                     </div>
                                     ${data.tag === 'Thoughts' ? `
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -457,9 +462,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // dashboard entry search functionality
 document.addEventListener('DOMContentLoaded', function () {
     const searchEntry = document.getElementById('entrySearch');
-    if (!searchEntry) {
+    const allEntriesContainer = document.getElementById("allEntriesContainer");
+
+    if (!searchEntry || !allEntriesContainer) {
         return;
     }
+
     const items = Array.from(document.querySelectorAll('.entry'));
     if (items.length === 0) {
         return;
@@ -472,8 +480,18 @@ document.addEventListener('DOMContentLoaded', function () {
         sections.forEach(section => {
             const header = section.querySelector('.category-header');
             const collapseContent = section.querySelector('.collapse-content');
-            const entries = Array.from(section.querySelectorAll('.entry'));
+            let entries = Array.from(section.querySelectorAll('.entry'));
             let anyVisible = false;
+            let ignoreHeaders = false;
+
+            if (entries.length === 0) {
+                let tempEntries = allEntriesContainer.querySelectorAll('.entry');
+
+                if (tempEntries) {
+                    ignoreHeaders = true;
+                    entries = Array.from(tempEntries);
+                }
+            }
 
             entries.forEach(entry => {
                 const name = entry.querySelector('.item-text.d-block')?.textContent.trim().toLowerCase() || '';
@@ -486,28 +504,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            if (!header) {
-                return;
-            }
-
-            if (anyVisible && searchUserValue.length !== 0) {
-                header.classList.remove('collapsed');
-                header.setAttribute('aria-expanded', 'true');
-                if (collapseContent) {
-                    collapseContent.classList.add('show');
+            if (!ignoreHeaders) {
+                if (!header) {
+                    return;
                 }
-            } else {
-                header.classList.add('collapsed');
-                header.setAttribute('aria-expanded', 'false');
-                if (collapseContent) {
-                    collapseContent.classList.remove('show');
-                }
-            }
 
-            if (!anyVisible) {
-                header.classList.add('visually-hidden');
-            } else {
-                header.classList.remove('visually-hidden');
+                if (anyVisible && searchUserValue.length !== 0) {
+                    header.classList.remove('collapsed');
+                    header.setAttribute('aria-expanded', 'true');
+                    if (collapseContent) {
+                        collapseContent.classList.add('show');
+                    }
+                } else {
+                    header.classList.add('collapsed');
+                    header.setAttribute('aria-expanded', 'false');
+                    if (collapseContent) {
+                        collapseContent.classList.remove('show');
+                    }
+                }
+
+                if (!anyVisible) {
+                    header.classList.add('visually-hidden');
+                } else {
+                    header.classList.remove('visually-hidden');
+                }
             }
         });
     });

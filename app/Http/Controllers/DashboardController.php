@@ -19,80 +19,6 @@ use Throwable;
 
 class DashboardController extends Controller
 {
-    private function getConversation(int $entryId): Collection
-    {
-        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->get();
-        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->get();
-
-        $conversation = collect();
-        foreach ($notes as $i => $note) {
-            $conversation->push([
-                'note' => $note->content,
-                'date' => $note->created_at,
-                'model_name' => $responses[$i]->model_name ?? null,
-                'response' => $responses[$i]->content ?? null,
-            ]);
-        }
-
-        return $conversation;
-    }
-
-    private function buildConversationPrompt(int $entryId): string
-    {
-        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->take(10)->get()->reverse();
-        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->take(10)->get()->reverse();
-
-        $prompt = '';
-
-        foreach ($notes as $i => $note) {
-            $prompt .= "User ({$note->created_at->format('Y-m-d H:i')}):\n";
-            $prompt .= trim($note->content) . "\n\n";
-
-            if (isset($responses[$i])) {
-                $prompt .= "Assistant:\n";
-                $prompt .= trim($responses[$i]->content) . "\n\n";
-            }
-        }
-
-        return trim($prompt);
-    }
-
-    private function generateTitle(string $content, string $ollamaHost): string
-    {
-        $firstModel = AiModel::where('status', 'ready')->orderBy('id')->firstOrFail();
-
-        try {
-            $response = Http::timeout(0)->post($ollamaHost . '/api/generate', [
-                'model' => $firstModel->name,
-                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
-                'prompt' => $content,
-                'stream' => false,
-            ]);
-
-            return trim($response->json('response') ?: 'Untitled Entry', "\" \n\t.");
-        } catch (Throwable) {
-            return 'Untitled Entry';
-        }
-    }
-
-    private function systemPrompt(): string
-    {
-        return <<<PROMPT
-        You are a journaling assistant helping a user reflect over time.
-
-        You will receive messages from the user which may include:
-        - Journal entries
-        - Previous reflections
-        - Casual comments or jokes
-
-        Your task:
-        - Ask ONE thoughtful, open-ended question about the user’s feelings, values, or experiences. You may vary your style and tone.
-        - If the user writes something unrelated or playful, you may lightly acknowledge it in the question, but continue reflecting.
-        - Do NOT give advice, explanations, or instructions.
-        - Output ONLY the question.
-        PROMPT;
-    }
-
     public function index(Request $request): Factory|View
     {
         $user = $request->user();
@@ -232,6 +158,19 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function restore(Request $request)
+    {
+        $data = $request->validate([
+            'entry_id' => 'required|integer|exists:entries,id',
+        ]);
+
+        $entry = Entry::where('id', $data['entry_id'])->where('user_id', $request->user()->id)->firstOrFail();
+
+        $entry->update(['is_deleted' => false]);
+
+        return redirect()->route('dashboard');
+    }
+
     public function destroy(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -243,5 +182,79 @@ class DashboardController extends Controller
         $entry->delete();
 
         return response()->json();
+    }
+
+    private function getConversation(int $entryId): Collection
+    {
+        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->get();
+        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->get();
+
+        $conversation = collect();
+        foreach ($notes as $i => $note) {
+            $conversation->push([
+                'note' => $note->content,
+                'date' => $note->created_at,
+                'model_name' => $responses[$i]->model_name ?? null,
+                'response' => $responses[$i]->content ?? null,
+            ]);
+        }
+
+        return $conversation;
+    }
+
+    private function buildConversationPrompt(int $entryId): string
+    {
+        $notes = Note::where('entry_id', $entryId)->orderBy('created_at')->take(10)->get()->reverse();
+        $responses = Response::where('entry_id', $entryId)->orderBy('created_at')->take(10)->get()->reverse();
+
+        $prompt = '';
+
+        foreach ($notes as $i => $note) {
+            $prompt .= "User ({$note->created_at->format('Y-m-d H:i')}):\n";
+            $prompt .= trim($note->content) . "\n\n";
+
+            if (isset($responses[$i])) {
+                $prompt .= "Assistant:\n";
+                $prompt .= trim($responses[$i]->content) . "\n\n";
+            }
+        }
+
+        return trim($prompt);
+    }
+
+    private function generateTitle(string $content, string $ollamaHost): string
+    {
+        $firstModel = AiModel::where('status', 'ready')->orderBy('id')->firstOrFail();
+
+        try {
+            $response = Http::timeout(0)->post($ollamaHost . '/api/generate', [
+                'model' => $firstModel->name,
+                'system' => 'You are a journaling assistant. The user will provide a journal entry. Your tasks is to create a short, clear title (maximum 6 words) that captures the core idea of the journal entry. No extra words. In case the entry is nonsensical or empty, respond with "Untitled Entry".',
+                'prompt' => $content,
+                'stream' => false,
+            ]);
+
+            return trim($response->json('response') ?: 'Untitled Entry', "\" \n\t.");
+        } catch (Throwable) {
+            return 'Untitled Entry';
+        }
+    }
+
+    private function systemPrompt(): string
+    {
+        return <<<PROMPT
+        You are a journaling assistant helping a user reflect over time.
+
+        You will receive messages from the user which may include:
+        - Journal entries
+        - Previous reflections
+        - Casual comments or jokes
+
+        Your task:
+        - Ask ONE thoughtful, open-ended question about the user’s feelings, values, or experiences. You may vary your style and tone.
+        - If the user writes something unrelated or playful, you may lightly acknowledge it in the question, but continue reflecting.
+        - Do NOT give advice, explanations, or instructions.
+        - Output ONLY the question.
+        PROMPT;
     }
 }

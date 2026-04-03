@@ -33,6 +33,7 @@ Route::middleware('auth')->controller(DashboardController::class)->group(functio
     Route::delete('/dashboard/destroy', 'destroy')->name('dashboard.destroy');
     Route::delete('/dashboard', 'delete')->name('dashboard.delete');
     Route::get('/dashboard', 'index')->name('dashboard');
+    Route::get('/dashboard/restore', 'restore')->name('dashboard.restore');
     Route::get('/dashboard/entry', 'showEntry')->name('dashboard.showEntry');
 });
 

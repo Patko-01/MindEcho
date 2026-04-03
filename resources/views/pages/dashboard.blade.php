@@ -223,8 +223,7 @@
                             </div>
                             <span class="badge rounded-pill">{{ count($entries) }}</span>
                         </div>
-                        <div id="{{ $tag }}"
-                             class="collapse collapse-content fade-smooth mt-2 {{ session('tag') == $tag ? 'show' : '' }}">
+                        <div id="{{ $tag }}" class="collapse collapse-content fade-smooth mt-2 {{ session('tag') == $tag ? 'show' : '' }}">
                             @foreach($entries as $entry)
                                 <form method="POST" class="tag-{{ $tag }} entry"
                                       action="{{ route('dashboard.delete') }}">
@@ -238,10 +237,10 @@
                                             <a href="{{ $tag == 'Thoughts' ? route('dashboard.showEntry', ['entry_id' => $entry->id]) : '#' }}"
                                                class="btn btn-link w-100 text-start p-0 text-decoration-none text-body"
                                                aria-label="Open entry: {{ $entry->entry_title }}">
-                                            <span class="d-block">
-                                                <span class="item-text d-block">{{ $entry->entry_title }}</span>
-                                                <span class="item-date d-block" data-date="{{ $entry->updated_at }}">{{ Carbon::parse($entry->updated_at)->diffForHumans() }}</span>
-                                            </span>
+                                                <span class="d-block">
+                                                    <span class="item-text d-block">{{ $entry->entry_title }}</span>
+                                                    <span class="item-date d-block" data-date="{{ $entry->updated_at }}">{{ Carbon::parse($entry->updated_at)->diffForHumans() }}</span>
+                                                </span>
                                             </a>
                                         </div>
                                     </div>
@@ -251,7 +250,7 @@
                     </div>
                 @endforeach
                 <p class="text-center text-muted {{ count($deletedEntries) > 0 ? '' : 'visually-hidden' }}" id="deletedEntriesLine">deleted</p>
-                <div id="divWithDeletedEntries" data-destroy-url="{{ route('dashboard.destroy') }}">
+                <div id="divWithDeletedEntries" data-destroy-url="{{ route('dashboard.destroy') }}" data-restore-url="{{ route('dashboard.restore') }}">
                     @foreach($deletedEntries as $entry)
                         <form method="POST" action="{{ route('dashboard.destroy') }}">
                             @csrf
@@ -261,10 +260,14 @@
                                        class="form-check-input mt-0 submit-on-check" type="checkbox"
                                        aria-label="Mark entry '{{ $entry->entry_title }}' as completed">
                                 <div class="flex-grow-1">
-                                <span class="d-block">
-                                    <span class="item-text d-block">{{ $entry->entry_title }}</span>
-                                    <span class="item-date d-block">{{ Carbon::parse($entry->updated_at)->diffForHumans() }}</span>
-                                </span>
+                                    <a href="{{ route('dashboard.restore', ['entry_id' => $entry->id]) }}"
+                                       class="btn btn-link w-100 text-start p-0 text-decoration-none text-body"
+                                       aria-label="Restore entry: {{ $entry->entry_title }}">
+                                        <span class="d-block">
+                                            <span class="item-text d-block">{{ $entry->entry_title }}</span>
+                                            <span class="item-date d-block">{{ Carbon::parse($entry->updated_at)->diffForHumans() }}</span>
+                                        </span>
+                                    </a>
                                 </div>
                                 @if($entry->tag == 'Thoughts')
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
